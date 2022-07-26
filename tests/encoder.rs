@@ -52,8 +52,8 @@ fn test_encode_string() {
     let v = "Test String";
     encoder = encoder.encode_string(v);
 
-    assert_eq!(encoder.position() as usize, 1+1+1+4+v.len());
-    assert_eq!(encoder.get_ref()[1+1+1+4..].to_owned(), v.as_bytes());
+    assert_eq!(encoder.position() as usize, 1+1+4+v.len());
+    assert_eq!(encoder.get_ref()[1+1+4..].to_owned(), v.as_bytes());
 }
 
 #[test]
