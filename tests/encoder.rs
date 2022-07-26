@@ -61,8 +61,8 @@ fn test_encode_error() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = "Test Error";
     encoder = encoder.encode_error(v);
-    assert_eq!(encoder.position() as usize, 1+1+4+v.len());
-    assert_eq!(encoder.get_ref()[1+1+4..].to_owned(), v.to_string().as_bytes());
+    assert_eq!(encoder.position() as usize, 1+1+1+4+v.len());
+    assert_eq!(encoder.get_ref()[1+1+1+4..].to_owned(), v.to_string().as_bytes());
 }
 
 #[test]

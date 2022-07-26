@@ -1,10 +1,9 @@
-use std::io::{Cursor, Read};
-use byteorder::{BigEndian, ReadBytesExt};
-use std::str;
 use crate::kind::Kind;
+use byteorder::{BigEndian, ReadBytesExt};
+use std::io::{Cursor, Read};
+use std::str;
 
-#[derive(Debug)]
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum DecodingError {
     InvalidNone,
     InvalidArray,
@@ -20,7 +19,7 @@ pub enum DecodingError {
     InvalidI32,
     InvalidI64,
     InvalidF32,
-    InvalidF64
+    InvalidF64,
 }
 
 pub trait Decoder {
@@ -45,9 +44,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
     fn decode_none(&mut self) -> bool {
         match self.read_u8() {
             Err(_) => false,
-            Ok(val) => {
-                val == Kind::None as u8
-            }
+            Ok(val) => val == Kind::None as u8,
         }
     }
 
@@ -57,8 +54,8 @@ impl Decoder for Cursor<&mut Vec<u8>> {
         if kind == Kind::Array as u8 && val_kind as u8 == defined_val_kind {
             return match self.decode_u32() {
                 Err(err) => Err(err),
-                Ok(val) => Ok(val as usize)
-            }
+                Ok(val) => Ok(val as usize),
+            };
         }
         Err(DecodingError::InvalidU32)
     }
@@ -67,11 +64,14 @@ impl Decoder for Cursor<&mut Vec<u8>> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidMap)?;
         let defined_key_kind = self.read_u8().ok().ok_or(DecodingError::InvalidMap)?;
         let defined_val_kind = self.read_u8().ok().ok_or(DecodingError::InvalidMap)?;
-        if kind == Kind::Map as u8 && key_kind as u8 == defined_key_kind && val_kind as u8 == defined_val_kind {
+        if kind == Kind::Map as u8
+            && key_kind as u8 == defined_key_kind
+            && val_kind as u8 == defined_val_kind
+        {
             return match self.decode_u32() {
                 Err(err) => Err(err),
-                Ok(val) => Ok(val as usize)
-            }
+                Ok(val) => Ok(val as usize),
+            };
         }
         Err(DecodingError::InvalidMap)
     }
@@ -81,8 +81,10 @@ impl Decoder for Cursor<&mut Vec<u8>> {
         if kind == Kind::Bytes as u8 {
             let size = self.decode_u32()? as usize;
             let mut buf = vec![0u8; size];
-            self.read_exact(&mut buf).ok().ok_or(DecodingError::InvalidBytes)?;
-            return Ok(buf)
+            self.read_exact(&mut buf)
+                .ok()
+                .ok_or(DecodingError::InvalidBytes)?;
+            return Ok(buf);
         }
         Err(DecodingError::InvalidBytes)
     }
@@ -90,29 +92,34 @@ impl Decoder for Cursor<&mut Vec<u8>> {
     fn decode_string(&mut self) -> Result<String, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidString)?;
         if kind == Kind::String as u8 {
-            let size= self.decode_u32()? as usize;
+            let size = self.decode_u32()? as usize;
             let mut str_buf = vec![0u8; size];
-            self.read_exact(&mut str_buf).ok().ok_or(DecodingError::InvalidString)?;
+            self.read_exact(&mut str_buf)
+                .ok()
+                .ok_or(DecodingError::InvalidString)?;
 
             let result = str::from_utf8(&*str_buf)
                 .ok()
                 .ok_or(DecodingError::InvalidString)?;
-            return Ok(result.to_owned())
+            return Ok(result.to_owned());
         }
         Err(DecodingError::InvalidString)
     }
 
     fn decode_error(&mut self) -> Result<String, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidError)?;
-        if kind == Kind::Error as u8 {
-            let size= self.decode_u32()? as usize;
+        let nested_kind = self.read_u8().ok().ok_or(DecodingError::InvalidError)?;
+        if kind == Kind::Error as u8 && nested_kind == Kind::String as u8 {
+            let size = self.decode_u32()? as usize;
             let mut str_buf = vec![0u8; size];
-            self.read_exact(&mut str_buf).ok().ok_or(DecodingError::InvalidError)?;
+            self.read_exact(&mut str_buf)
+                .ok()
+                .ok_or(DecodingError::InvalidError)?;
 
             let result = str::from_utf8(&*str_buf)
                 .ok()
                 .ok_or(DecodingError::InvalidError)?;
-            return Ok(result.to_owned())
+            return Ok(result.to_owned());
         }
         Err(DecodingError::InvalidError)
     }
@@ -121,7 +128,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidBool)?;
         if kind == Kind::Bool as u8 {
             let val = self.read_u8().ok().ok_or(DecodingError::InvalidBool)?;
-            return Ok(val == 1)
+            return Ok(val == 1);
         }
         Err(DecodingError::InvalidBool)
     }
@@ -129,7 +136,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
     fn decode_u8(&mut self) -> Result<u8, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidU8)?;
         if kind == Kind::U8 as u8 {
-            return self.read_u8().ok().ok_or(DecodingError::InvalidU8)
+            return self.read_u8().ok().ok_or(DecodingError::InvalidU8);
         }
         Err(DecodingError::InvalidU8)
     }
@@ -137,7 +144,10 @@ impl Decoder for Cursor<&mut Vec<u8>> {
     fn decode_u16(&mut self) -> Result<u16, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidU16)?;
         if kind == Kind::U16 as u8 {
-            return self.read_u16::<BigEndian>().ok().ok_or(DecodingError::InvalidU16)
+            return self
+                .read_u16::<BigEndian>()
+                .ok()
+                .ok_or(DecodingError::InvalidU16);
         }
         Err(DecodingError::InvalidU16)
     }
@@ -145,7 +155,10 @@ impl Decoder for Cursor<&mut Vec<u8>> {
     fn decode_u32(&mut self) -> Result<u32, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidU32)?;
         if kind == Kind::U32 as u8 {
-            return self.read_u32::<BigEndian>().ok().ok_or(DecodingError::InvalidU32)
+            return self
+                .read_u32::<BigEndian>()
+                .ok()
+                .ok_or(DecodingError::InvalidU32);
         }
         Err(DecodingError::InvalidU32)
     }
@@ -153,7 +166,10 @@ impl Decoder for Cursor<&mut Vec<u8>> {
     fn decode_u64(&mut self) -> Result<u64, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidU64)?;
         if kind == Kind::U64 as u8 {
-            return self.read_u64::<BigEndian>().ok().ok_or(DecodingError::InvalidU64)
+            return self
+                .read_u64::<BigEndian>()
+                .ok()
+                .ok_or(DecodingError::InvalidU64);
         }
         Err(DecodingError::InvalidU64)
     }
@@ -161,7 +177,10 @@ impl Decoder for Cursor<&mut Vec<u8>> {
     fn decode_i32(&mut self) -> Result<i32, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidI32)?;
         if kind == Kind::I32 as u8 {
-            return self.read_i32::<BigEndian>().ok().ok_or(DecodingError::InvalidI32)
+            return self
+                .read_i32::<BigEndian>()
+                .ok()
+                .ok_or(DecodingError::InvalidI32);
         }
         Err(DecodingError::InvalidI32)
     }
@@ -169,7 +188,10 @@ impl Decoder for Cursor<&mut Vec<u8>> {
     fn decode_i64(&mut self) -> Result<i64, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidI64)?;
         if kind == Kind::I64 as u8 {
-            return self.read_i64::<BigEndian>().ok().ok_or(DecodingError::InvalidI64)
+            return self
+                .read_i64::<BigEndian>()
+                .ok()
+                .ok_or(DecodingError::InvalidI64);
         }
         Err(DecodingError::InvalidI64)
     }
@@ -177,7 +199,10 @@ impl Decoder for Cursor<&mut Vec<u8>> {
     fn decode_f32(&mut self) -> Result<f32, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidF32)?;
         if kind == Kind::F32 as u8 {
-            return self.read_f32::<BigEndian>().ok().ok_or(DecodingError::InvalidF32)
+            return self
+                .read_f32::<BigEndian>()
+                .ok()
+                .ok_or(DecodingError::InvalidF32);
         }
         Err(DecodingError::InvalidF32)
     }
@@ -185,7 +210,10 @@ impl Decoder for Cursor<&mut Vec<u8>> {
     fn decode_f64(&mut self) -> Result<f64, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidF64)?;
         if kind == Kind::F64 as u8 {
-            return self.read_f64::<BigEndian>().ok().ok_or(DecodingError::InvalidF64)
+            return self
+                .read_f64::<BigEndian>()
+                .ok()
+                .ok_or(DecodingError::InvalidF64);
         }
         Err(DecodingError::InvalidF64)
     }

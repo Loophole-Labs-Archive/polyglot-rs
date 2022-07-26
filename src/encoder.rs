@@ -1,6 +1,6 @@
-use std::io::{Cursor, Write};
-use byteorder::{BigEndian, WriteBytesExt};
 use crate::kind::Kind;
+use byteorder::{BigEndian, WriteBytesExt};
+use std::io::{Cursor, Write};
 
 pub trait Encoder {
     fn encode_none(self) -> Self;
@@ -64,6 +64,7 @@ impl Encoder for Cursor<Vec<u8>> {
     fn encode_error(mut self, val: &str) -> Self {
         let b = val.as_bytes();
         self.write_u8(Kind::Error as u8).unwrap();
+        self.write_u8(Kind::String as u8).unwrap();
         self = self.encode_u32(b.len() as u32);
         self.write_all(b).unwrap();
         self

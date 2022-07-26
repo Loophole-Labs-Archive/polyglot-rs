@@ -144,24 +144,44 @@ fn test_encode() {
                 }
             }
 
-            // Kind::Array => todo!(),
-            // Kind::Map => todo!(),
-            // Kind::Any => todo!(),
-            // Kind::Bytes => todo!(),
-            // Kind::String => todo!(),
-            // Kind::Error => todo!(),
-            // Kind::Bool => todo!(),
-            // Kind::U8 => todo!(),
-            // Kind::U16 => todo!(),
-            // Kind::U32 => todo!(),
-            // Kind::U64 => todo!(),
-            // Kind::I32 => todo!(),
-            // Kind::I64 => todo!(),
-            // Kind::F32 => todo!(),
-            // Kind::F64 => todo!(),
+            Kind::Map => {
+                let len = decoder.decode_map(Kind::String, Kind::U32).unwrap();
 
-            // _ => panic!("Unimplemented decoder for test {}", td.name),
-            _ => {}
+                let expected = td.decoded_value.as_object().unwrap();
+
+                assert_eq!(expected.len(), len);
+
+                for (expected_key, expected_value) in expected {
+                    let actual_key = decoder.decode_string().unwrap();
+                    let actual_value = decoder.decode_u32().unwrap();
+
+                    assert_eq!(expected_key.as_str(), actual_key);
+                    assert_eq!(expected_value.as_u64().unwrap(), actual_value as u64);
+                }
+            }
+
+            Kind::Bytes => {
+                let val = decoder.decode_bytes().unwrap();
+
+                assert_eq!(
+                    val,
+                    base64::decode(td.decoded_value.as_str().unwrap()).unwrap()
+                );
+            }
+
+            Kind::String => {
+                let val = decoder.decode_string().unwrap();
+
+                assert_eq!(val, td.decoded_value.as_str().unwrap());
+            }
+
+            Kind::Error => {
+                let val = decoder.decode_error().unwrap();
+
+                assert_eq!(val, td.decoded_value.as_str().unwrap());
+            }
+
+            _ => panic!("Unimplemented decoder for test {}", td.name),
         }
     }
 }
