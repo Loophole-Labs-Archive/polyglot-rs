@@ -46,7 +46,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
         match self.read_u8() {
             Err(_) => false,
             Ok(val) => {
-                return val == Kind::None as u8
+                val == Kind::None as u8
             }
         }
     }

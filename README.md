@@ -1,7 +1,8 @@
 # polyglot-rs
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-brightgreen.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-[![Tests](https://github.com/loopholelabs/polyglot-rs/actions/workflows/rust.yml/badge.svg)](https://github.com/loopholelabs/polyglot-rs/actions/workflows/rust.yml)
+[![Tests](https://github.com/loopholelabs/polyglot-rs/actions/workflows/tests.yml/badge.svg)](https://github.com/loopholelabs/polyglot-rs/actions/workflows/tests.yml)
+[![Linting](https://github.com/loopholelabs/polyglot-rs/actions/workflows/lint.yml/badge.svg)](https://github.com/loopholelabs/polyglot-rs/actions/workflows/lint.yml)
 
 Rust library used for encoding and decoding data types from a portable byte buffer, used in [FRPC](https://github.com/loopholelabs/frisbee)
 
