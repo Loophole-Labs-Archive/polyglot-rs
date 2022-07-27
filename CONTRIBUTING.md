@@ -14,3 +14,5 @@ Polyglot-RS uses GitHub to manage reviews of pull requests.
 - Relevant coding style guidelines is the [Official Rust Style Guide](https://github.com/rust-dev-tools/fmt-rfcs/blob/master/guide/guide.md)
 
 - Be sure to sign off on the [DCO](https://github.com/probot/dco#how-it-works)
+
+- To update the integration test data, run `curl -Lo resources/test/polyglot-test-data.json https://github.com/loopholelabs/polyglot-test-data/releases/latest/download/polyglot-test-data.json`

@@ -1,14 +1,13 @@
 extern crate polyglot;
 
-use lazy_static::lazy_static;
 use polyglot::Decoder;
 use polyglot::Encoder;
 use polyglot::Kind;
 use serde::Deserialize;
 use serde_json::Value;
+use std::fs;
 use std::io::Cursor;
-use std::sync::Mutex;
-use std::sync::Once;
+use std::path::Path;
 
 #[derive(Debug, Deserialize)]
 struct RawTestData {
@@ -27,38 +26,34 @@ struct TestData {
     encoded_value: Vec<u8>,
 }
 
-static TEST_DATA_URL: &str = "https://github.com/loopholelabs/polyglot-test-data/releases/download/unstable/polyglot-test-data.json";
-static INIT: Once = Once::new();
-
-lazy_static! {
-    static ref TEST_DATA: Mutex<Vec<TestData>> = Mutex::new(vec![]);
-}
-
-fn init() {
-    INIT.call_once(|| {
-        reqwest::blocking::get(TEST_DATA_URL)
-            .unwrap()
-            .json::<Vec<RawTestData>>()
-            .unwrap()
-            .into_iter()
-            .for_each(|td| {
-                TEST_DATA.lock().unwrap().push(TestData {
-                    name: td.name,
-                    kind: Kind::from(td.kind),
-                    decoded_value: td.decoded_value,
-                    encoded_value: base64::decode(td.encoded_value).unwrap(),
-                })
-            });
+fn get_test_data() -> Vec<TestData> {
+    return serde_json::from_slice::<Vec<RawTestData>>(
+        &fs::read(
+            Path::new(env!("CARGO_MANIFEST_DIR"))
+                .join("resources")
+                .join("test")
+                .join("polyglot-test-data.json"),
+        )
+        .unwrap(),
+    )
+    .unwrap()
+    .into_iter()
+    .map(|td| {
+        return TestData {
+            name: td.name,
+            kind: Kind::from(td.kind),
+            decoded_value: td.decoded_value,
+            encoded_value: base64::decode(td.encoded_value).unwrap(),
+        };
     })
+    .collect::<Vec<TestData>>();
 }
 
 #[test]
 fn test_decode() {
-    init();
+    let test_data = get_test_data();
 
-    let a: &mut Vec<TestData> = &mut TEST_DATA.lock().unwrap();
-
-    for td in a {
+    for mut td in test_data {
         let mut decoder = Cursor::new(td.encoded_value.as_mut());
 
         match td.kind {
@@ -189,11 +184,9 @@ fn test_decode() {
 
 #[test]
 fn test_encode() {
-    init();
+    let test_data = get_test_data();
 
-    let a: &mut Vec<TestData> = &mut TEST_DATA.lock().unwrap();
-
-    for td in a {
+    for td in test_data {
         let encoder = Cursor::new(Vec::with_capacity(512));
 
         match td.kind {
