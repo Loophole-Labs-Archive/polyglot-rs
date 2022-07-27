@@ -2,6 +2,7 @@ extern crate polyglot;
 
 use lazy_static::lazy_static;
 use polyglot::Decoder;
+use polyglot::Encoder;
 use polyglot::Kind;
 use serde::Deserialize;
 use serde_json::Value;
@@ -52,7 +53,7 @@ fn init() {
 }
 
 #[test]
-fn test_encode() {
+fn test_decode() {
     init();
 
     let a: &mut Vec<TestData> = &mut TEST_DATA.lock().unwrap();
@@ -179,6 +180,136 @@ fn test_encode() {
                 let val = decoder.decode_error().unwrap();
 
                 assert_eq!(val, td.decoded_value.as_str().unwrap());
+            }
+
+            _ => panic!("Unimplemented decoder for test {}", td.name),
+        }
+    }
+}
+
+#[test]
+fn test_encode() {
+    init();
+
+    let a: &mut Vec<TestData> = &mut TEST_DATA.lock().unwrap();
+
+    for td in a {
+        let encoder = Cursor::new(Vec::with_capacity(512));
+
+        match td.kind {
+            Kind::None => {
+                let val = encoder.encode_none();
+
+                assert_eq!(*val.get_ref(), td.encoded_value);
+            }
+
+            Kind::Bool => {
+                let val = encoder.encode_bool(td.decoded_value.as_bool().unwrap());
+
+                assert_eq!(*val.get_ref(), td.encoded_value);
+            }
+
+            Kind::U8 => {
+                let val = encoder.encode_u8(td.decoded_value.as_u64().unwrap() as u8);
+
+                assert_eq!(*val.get_ref(), td.encoded_value);
+            }
+
+            Kind::U16 => {
+                let val = encoder.encode_u16(td.decoded_value.as_u64().unwrap() as u16);
+
+                assert_eq!(*val.get_ref(), td.encoded_value);
+            }
+
+            Kind::U32 => {
+                let val = encoder.encode_u32(td.decoded_value.as_u64().unwrap() as u32);
+
+                assert_eq!(*val.get_ref(), td.encoded_value);
+            }
+
+            Kind::U64 => {
+                let val = encoder.encode_u64(td.decoded_value.as_u64().unwrap());
+
+                assert_eq!(*val.get_ref(), td.encoded_value);
+            }
+
+            Kind::I32 => {
+                let val = encoder.encode_i32(td.decoded_value.as_i64().unwrap() as i32);
+
+                assert_eq!(*val.get_ref(), td.encoded_value);
+            }
+
+            Kind::I64 => {
+                let val = encoder.encode_i64(td.decoded_value.as_i64().unwrap());
+
+                assert_eq!(*val.get_ref(), td.encoded_value);
+            }
+
+            Kind::F32 => {
+                let val = encoder.encode_f32(td.decoded_value.as_f64().unwrap() as f32);
+
+                assert_eq!(*val.get_ref(), td.encoded_value);
+            }
+
+            Kind::F64 => {
+                let val = encoder.encode_f64(td.decoded_value.as_f64().unwrap());
+
+                for (i, expected) in (&td.encoded_value).into_iter().enumerate() {
+                    // Ignore last byte; 64-bit float precision
+                    if i < td.encoded_value.len() - 1 {
+                        assert_eq!(*expected, val.get_ref()[i])
+                    }
+                }
+            }
+
+            Kind::Array => {
+                let mut val =
+                    encoder.encode_array(td.decoded_value.as_array().unwrap().len(), Kind::String);
+
+                let expected = td.decoded_value.as_array().unwrap();
+
+                for el in expected.into_iter() {
+                    val = val.encode_string(el.as_str().unwrap());
+                }
+
+                assert_eq!(*val.get_ref(), td.encoded_value);
+            }
+
+            Kind::Map => {
+                let mut val = encoder.encode_map(
+                    td.decoded_value.as_object().unwrap().len(),
+                    Kind::String,
+                    Kind::U32,
+                );
+
+                let expected = td.decoded_value.as_object().unwrap();
+
+                for (expected_key, expected_value) in expected {
+                    val = val
+                        .encode_string(&expected_key)
+                        .encode_u32(expected_value.as_u64().unwrap() as u32);
+                }
+
+                assert_eq!(*val.get_ref(), td.encoded_value);
+            }
+
+            Kind::Bytes => {
+                let val = encoder
+                    .encode_bytes(&base64::decode(td.decoded_value.as_str().unwrap()).unwrap());
+
+                assert_eq!(*val.get_ref(), td.encoded_value);
+            }
+
+            Kind::String => {
+                let val = encoder.encode_string(td.decoded_value.as_str().unwrap());
+
+                assert_eq!(*val.get_ref(), td.encoded_value);
+            }
+
+            Kind::Error => {
+                let val = encoder.encode_error(td.decoded_value.as_str().unwrap());
+
+                assert_eq!(*val.get_ref(), td.encoded_value);
             }
 
             _ => panic!("Unimplemented decoder for test {}", td.name),
