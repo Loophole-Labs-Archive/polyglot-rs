@@ -1,27 +1,27 @@
 /*
-	Copyright 2022 Loophole Labs
+    Copyright 2022 Loophole Labs
 
-	Licensed under the Apache License, Version 2.0 (the "License");
-	you may not use this file except in compliance with the License.
-	You may obtain a copy of the License at
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
 
-		   http://www.apache.org/licenses/LICENSE-2.0
+           http://www.apache.org/licenses/LICENSE-2.0
 
-	Unless required by applicable law or agreed to in writing, software
-	distributed under the License is distributed on an "AS IS" BASIS,
-	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	See the License for the specific language governing permissions and
-	limitations under the License.
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
 */
 
 extern crate polyglot;
 
-use std::io::Cursor;
 use polyglot::Encoder;
 use polyglot::Kind;
+use std::io::Cursor;
 
 #[test]
-fn test_encode_nil () {
+fn test_encode_nil() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     encoder = encoder.encode_none();
 
@@ -34,7 +34,7 @@ fn test_encode_array() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     encoder = encoder.encode_array(32, Kind::String);
 
-    assert_eq!(encoder.position(), 1+1+1+4);
+    assert_eq!(encoder.position(), 1 + 1 + 1 + 4);
     assert_eq!(encoder.get_ref()[0], Kind::Array as u8);
     assert_eq!(encoder.get_ref()[1], Kind::String as u8);
     assert_eq!(encoder.get_ref()[2], Kind::U32 as u8);
@@ -45,7 +45,7 @@ fn test_encode_map() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     encoder = encoder.encode_map(32, Kind::String, Kind::U32);
 
-    assert_eq!(encoder.position(), 1+1+1+1+4);
+    assert_eq!(encoder.position(), 1 + 1 + 1 + 1 + 4);
     assert_eq!(encoder.get_ref()[0], Kind::Map as u8);
     assert_eq!(encoder.get_ref()[1], Kind::String as u8);
     assert_eq!(encoder.get_ref()[2], Kind::U32 as u8);
@@ -58,8 +58,8 @@ fn test_encode_bytes() {
     let v = "Test String".as_bytes();
     encoder = encoder.encode_bytes(v);
 
-    assert_eq!(encoder.position() as usize, 1+1+4+v.len());
-    assert_eq!(encoder.get_ref()[1+1+4..].to_owned(), v);
+    assert_eq!(encoder.position() as usize, 1 + 1 + 4 + v.len());
+    assert_eq!(encoder.get_ref()[1 + 1 + 4..].to_owned(), v);
 }
 
 #[test]
@@ -68,8 +68,8 @@ fn test_encode_string() {
     let v = "Test String";
     encoder = encoder.encode_string(v);
 
-    assert_eq!(encoder.position() as usize, 1+1+4+v.len());
-    assert_eq!(encoder.get_ref()[1+1+4..].to_owned(), v.as_bytes());
+    assert_eq!(encoder.position() as usize, 1 + 1 + 4 + v.len());
+    assert_eq!(encoder.get_ref()[1 + 1 + 4..].to_owned(), v.as_bytes());
 }
 
 #[test]
@@ -77,8 +77,11 @@ fn test_encode_error() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = "Test Error";
     encoder = encoder.encode_error(v);
-    assert_eq!(encoder.position() as usize, 1+1+1+4+v.len());
-    assert_eq!(encoder.get_ref()[1+1+1+4..].to_owned(), v.to_string().as_bytes());
+    assert_eq!(encoder.position() as usize, 1 + 1 + 1 + 4 + v.len());
+    assert_eq!(
+        encoder.get_ref()[1 + 1 + 1 + 4..].to_owned(),
+        v.to_string().as_bytes()
+    );
 }
 
 #[test]
