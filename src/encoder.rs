@@ -23,8 +23,8 @@ pub trait Encoder {
     fn encode_array(self, size: usize, val_kind: Kind) -> Self;
     fn encode_map(self, size: usize, key_kind: Kind, val_kind: Kind) -> Self;
     fn encode_bytes(self, val: &[u8]) -> Self;
-    fn encode_string(self, val: String) -> Self;
-    fn encode_error(self, val: String) -> Self;
+    fn encode_string(self, val: &str) -> Self;
+    fn encode_error(self, val: &str) -> Self;
     fn encode_bool(self, val: bool) -> Self;
     fn encode_u8(self, val: u8) -> Self;
     fn encode_u16(self, val: u16) -> Self;
@@ -68,7 +68,7 @@ impl Encoder for &mut Cursor<Vec<u8>> {
     }
 
     #[must_use]
-    fn encode_string(self, val: String) -> Self {
+    fn encode_string(self, val: &str) -> Self {
         let b = val.as_bytes();
         self.write_u8(Kind::String as u8).unwrap();
         self.encode_u32(b.len() as u32);
@@ -77,7 +77,7 @@ impl Encoder for &mut Cursor<Vec<u8>> {
     }
 
     #[must_use]
-    fn encode_error(self, val: String) -> Self {
+    fn encode_error(self, val: &str) -> Self {
         let b = val.as_bytes();
         self.write_u8(Kind::Error as u8).unwrap();
         self.write_u8(Kind::String as u8).unwrap();

@@ -66,7 +66,7 @@ fn test_encode_bytes() {
 fn test_encode_string() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = "Test String";
-    encoder.encode_string(v.to_string());
+    encoder.encode_string(v);
 
     assert_eq!(encoder.position() as usize, 1 + 1 + 4 + v.len());
     assert_eq!(encoder.get_ref()[1 + 1 + 4..].to_owned(), v.as_bytes());
@@ -76,7 +76,7 @@ fn test_encode_string() {
 fn test_encode_error() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = "Test Error";
-    encoder.encode_error(v.to_string());
+    encoder.encode_error(v);
     assert_eq!(encoder.position() as usize, 1 + 1 + 1 + 4 + v.len());
     assert_eq!(
         encoder.get_ref()[1 + 1 + 1 + 4..].to_owned(),

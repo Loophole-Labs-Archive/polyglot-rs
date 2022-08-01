@@ -203,7 +203,7 @@ fn test_encode() {
     let test_data = get_test_data();
 
     for td in test_data {
-        let encoder = Cursor::new(Vec::with_capacity(512));
+        let mut encoder = Cursor::new(Vec::with_capacity(512));
 
         match td.kind {
             Kind::None => {
