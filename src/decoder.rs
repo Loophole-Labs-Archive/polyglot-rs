@@ -36,6 +36,7 @@ pub enum DecodingError {
     InvalidI64,
     InvalidF32,
     InvalidF64,
+    InvalidEnum,
 }
 
 pub trait Decoder {
