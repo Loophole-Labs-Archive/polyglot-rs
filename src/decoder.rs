@@ -14,7 +14,6 @@
     limitations under the License.
 */
 
-use std::collections::HashMap;
 use crate::kind::Kind;
 use byteorder::{BigEndian, ReadBytesExt};
 use std::io::{Cursor, Read};
