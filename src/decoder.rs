@@ -14,6 +14,7 @@
     limitations under the License.
 */
 
+use std::collections::HashMap;
 use crate::kind::Kind;
 use byteorder::{BigEndian, ReadBytesExt};
 use std::io::{Cursor, Read};
@@ -37,6 +38,7 @@ pub enum DecodingError {
     InvalidF32,
     InvalidF64,
     InvalidEnum,
+    InvalidStruct,
 }
 
 pub trait Decoder {
@@ -74,6 +76,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 Ok(val) => Ok(val as usize),
             };
         }
+
         Err(DecodingError::InvalidU32)
     }
 

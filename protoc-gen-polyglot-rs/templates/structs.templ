@@ -1,0 +1,18 @@
+{{define "structs"}}
+    {{ range $i, $v := (MakeIterable $.Messages.Len) }}
+        {{ $message := $.Messages.Get $i }}
+        {{ if not $message.IsMapEntry }}
+            {{template "structs" $message}}
+        {{end}}
+    {{end}}
+    struct {{ CamelCase .FullName }} {
+        {{ range $i, $v := (MakeIterable $.Fields.Len) -}}
+            {{ $field := $.Fields.Get $i -}}
+            {{ $value := FindValue $field -}}
+            {{ LowerCaseName $field.Name }}: {{ $value }},
+        {{end -}}
+    }
+
+    {{template "encode" .}}
+    {{template "decode" .}}
+{{end}}

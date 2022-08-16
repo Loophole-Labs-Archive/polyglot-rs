@@ -1,0 +1,50 @@
+{{define "decode"}}
+
+impl Decode for {{ CamelCase .FullName }} {
+    fn decode (b: &mut Cursor<&mut Vec<u8>>) -> Result<Option<{{ CamelCase .FullName }}>, DecodingError> {
+        if b.decode_none() {
+            return Ok(None);
+        }
+
+        {{ $decoding := GetDecodingFields .Fields -}}
+        {{ range $field := $decoding.SliceFields -}}
+            {{ $kind := GetKind $field.Kind -}}
+            {{ $decoder := GetLUTDecoder $field.Kind -}}
+            let {{ LowerCaseName $field.Name }}_size = b.decode_array({{ $kind }})?;
+            let mut {{ LowerCaseName $field.Name }}_temp = Vec::with_capacity({{ LowerCaseName $field.Name }}_size);
+            for _ in 0..{{ LowerCaseName $field.Name }}_size {
+                {{ if eq $field.Kind 11 -}} {{/* protoreflect.MessageKind */ -}}
+                {{ LowerCaseName $field.Name }}_temp.push({{ CamelCase $field.Message.FullName }}::decode(b)?.ok_or(DecodingError::InvalidArray)?);
+                {{ else -}}
+                {{ LowerCaseName $field.Name }}_temp.push(b{{ $decoder }}()?);
+                {{ end -}}
+            }
+        {{ end -}}
+        {{ range $field := $decoding.MessageFields -}}
+            {{ if $field.IsMap -}}
+                {{ template "decodeMap" $field -}}
+            {{ end -}}
+        {{ end -}}
+        Ok(Some({{ CamelCase .FullName }}{
+            {{ range $field := $decoding.SliceFields -}}
+                {{ LowerCaseName $field.Name }}: {{ LowerCaseName $field.Name }}_temp,
+            {{ end -}}
+            {{ range $field := $decoding.MessageFields -}}
+                {{ if $field.Message.IsMapEntry -}}
+                    {{ LowerCaseName $field.Name }}: {{ LowerCaseName $field.Name }}_decode(b)?.ok_or(DecodingError::InvalidMap)?,
+                {{ else -}}
+                    {{ LowerCaseName $field.Name }}: {{ CamelCase $field.Message.FullName }}::decode(b)?.ok_or(DecodingError::InvalidStruct)?,
+                {{ end -}}
+            {{ end -}}
+            {{ range $field := $decoding.Other -}}
+                {{ $decoder := GetLUTDecoder $field.Kind -}}
+                {{ if eq $field.Kind 14 -}}  {{/* protoreflect.EnumKind */ -}}
+                {{ LowerCaseName $field.Name }}: {{ FindValue $field }}::try_from(b.decode_u32()?).ok().ok_or(DecodingError::InvalidEnum)?,
+                {{ else -}}
+                {{ LowerCaseName $field.Name }}: b{{ $decoder }}()?,
+                {{end -}}
+            {{end -}}
+        }))
+    }
+}
+{{end}}
