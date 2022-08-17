@@ -1,0 +1,17 @@
+{{define "messages"}}
+pub trait Encode {
+    fn encode (self, b: &mut Cursor<Vec<u8>>) -> &mut Cursor<Vec<u8>>;
+}
+
+pub trait Decode {
+    fn decode (b: &mut Cursor<&mut Vec<u8>>) -> Result<Option<Self>, DecodingError> where Self: Sized;
+}
+{{range $i, $e := (MakeIterable .messages.Len) -}}
+    {{ $message := $.messages.Get $i }}
+    {{range $i, $e := (MakeIterable $message.Enums.Len) -}}
+        {{ $enum := ($message.Enums.Get $i) }}
+        {{template "enum" $enum}}
+    {{end}}
+    {{template "structs" $message}}
+{{end}}
+{{end}}

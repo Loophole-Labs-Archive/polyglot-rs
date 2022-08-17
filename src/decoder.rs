@@ -37,6 +37,7 @@ pub enum DecodingError {
     InvalidF32,
     InvalidF64,
     InvalidEnum,
+    InvalidStruct,
 }
 
 pub trait Decoder {
@@ -59,10 +60,13 @@ pub trait Decoder {
 
 impl Decoder for Cursor<&mut Vec<u8>> {
     fn decode_none(&mut self) -> bool {
-        match self.read_u8() {
-            Err(_) => false,
-            Ok(val) => val == Kind::None as u8,
+        if let Ok(kind) = self.read_u8() {
+            if kind == Kind::None as u8 {
+                return true;
+            }
         }
+        self.set_position(self.position() - 1);
+        false
     }
 
     fn decode_array(&mut self, val_kind: Kind) -> Result<usize, DecodingError> {
@@ -74,6 +78,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 Ok(val) => Ok(val as usize),
             };
         }
+
         Err(DecodingError::InvalidU32)
     }
 

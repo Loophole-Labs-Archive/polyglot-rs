@@ -16,6 +16,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Install Protoc
+      uses: arduino/setup-protoc@v1
+    - name: Install protoc-gen plugin
+      working-directory: ./protoc-gen-polyglot-rs
+      run: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+    - name: Install polyglot plugin for protoc-gen
+      working-directory: ./protoc-gen-polyglot-rs
+      run: go install protoc-gen-polyglot-rs/protoc-gen-polyglot-rs
+    - name: Run generator
+      working-directory: ./protoc-gen-polyglot-rs
+      run: protoc --polyglot-rs_out=../ examples/tests/tests.proto
     - name: Build
       run: cargo build --verbose
     - name: Run tests
