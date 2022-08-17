@@ -60,9 +60,11 @@ pub trait Decoder {
 
 impl Decoder for Cursor<&mut Vec<u8>> {
     fn decode_none(&mut self) -> bool {
-        match self.read_u8() {
-            Err(_) => false,
-            Ok(val) => val == Kind::None as u8,
+        if self.read_u8().is_ok() {
+            self.set_position(self.position() - 1);
+            false
+        } else {
+            true
         }
     }
 
