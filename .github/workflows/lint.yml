@@ -24,7 +24,7 @@ jobs:
         run: go install protoc-gen-polyglot-rs/protoc-gen-polyglot-rs
       - name: Run generator
         working-directory: ./protoc-gen-polyglot-rs
-        run: protoc --polyglot-rs_out=../ examples/test/test.proto
+        run: protoc --polyglot-rs_out=../ examples/tests/tests.proto
       - run: rustup component add clippy
       - uses: actions-rs/clippy-check@v1
         with:

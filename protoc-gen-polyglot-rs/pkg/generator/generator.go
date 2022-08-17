@@ -53,7 +53,8 @@ func New() *Generator {
 		"GetEncodingFields":  getEncodingFields,
 		"GetDecodingFields":  getDecodingFields,
 		"GetKindLUT":         getKindLUT,
-		"LowerCaseName":      utils.LowerCaseName,
+		"SnakeCase":          utils.SnakeCase,
+		"SnakeCaseName":      utils.SnakeCaseName,
 		"CustomFields": func() string {
 			return g.CustomFields()
 		},

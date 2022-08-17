@@ -17,6 +17,6 @@
 package generator
 
 const (
-	extension       = ".polyglot.rs"
+	extension       = ".rs"
 	polyglotAnyKind = "Kind::Any"
 )

@@ -5,11 +5,11 @@
             {{template "structs" $message}}
         {{end}}
     {{end}}
-    struct {{ CamelCase .FullName }} {
+    pub struct {{ CamelCase .FullName }} {
         {{ range $i, $v := (MakeIterable $.Fields.Len) -}}
             {{ $field := $.Fields.Get $i -}}
             {{ $value := FindValue $field -}}
-            {{ LowerCaseName $field.Name }}: {{ $value }},
+            pub(crate) {{ SnakeCaseName $field.Name }}: {{ $value }},
         {{end -}}
     }
 

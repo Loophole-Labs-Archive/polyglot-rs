@@ -21,13 +21,13 @@ impl Encode for {{ CamelCase .FullName }} {
         {{ $encoder := GetLUTEncoder $field.Kind -}}
 
         {{ if and (eq $encoder "") (eq $field.Kind 11) -}} {{/* protoreflect.MessageKind */ -}}
-        b.encode_array(self.{{ LowerCaseName $field.Name}}.len(), Kind::Any);
-        for item in self.{{ LowerCaseName $field.Name}} {
+        b.encode_array(self.{{ SnakeCaseName $field.Name}}.len(), Kind::Any);
+        for item in self.{{ SnakeCaseName $field.Name}} {
             item.encode(b);
         }
         {{else -}}
-        b.encode_array(self.{{ LowerCaseName $field.Name}}.len(), {{ GetKindLUT $field.Kind }});
-        for item in self.{{ LowerCaseName $field.Name}} {
+        b.encode_array(self.{{ SnakeCaseName $field.Name}}.len(), {{ GetKindLUT $field.Kind }});
+        for item in self.{{ SnakeCaseName $field.Name}} {
             {{ if eq $field.Kind 9 -}} {{/* protoreflect.StringKind */ -}}
             b{{$encoder}}(&*item);
             {{ else -}}
@@ -72,7 +72,7 @@ impl Encode for {{ CamelCase .FullName }} {
             {{end -}}
             }
         {{else -}}
-            self.{{ LowerCaseName $field.Name }}.encode(b);
+            self.{{ SnakeCaseName $field.Name }}.encode(b);
         {{end -}}
     {{end -}}
 {{end}}

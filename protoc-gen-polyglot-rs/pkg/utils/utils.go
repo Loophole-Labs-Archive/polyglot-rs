@@ -17,13 +17,12 @@
 package utils
 
 import (
+	"bytes"
 	"google.golang.org/protobuf/reflect/protoreflect"
 	"strings"
 	"unicode"
 	"unicode/utf8"
 )
-
-const extension = ".frpc.go"
 
 // CamelCase returns the CamelCased name.
 // If there is an interior underscore followed by a lower case letter,
@@ -73,8 +72,23 @@ func CamelCase(s string) string {
 	return string(t)
 }
 
-func LowerCaseName(name protoreflect.Name) string {
-	return strings.ToLower(string(name))
+func SnakeCase(s string) string {
+	var b bytes.Buffer
+	for _, c := range s {
+		if 'A' <= c && c <= 'Z' {
+			if b.Len() > 0 {
+				b.WriteRune('_')
+			}
+			b.WriteRune(c - 'A' + 'a')
+		} else {
+			b.WriteRune(c)
+		}
+	}
+	return b.String()
+}
+
+func SnakeCaseName(name protoreflect.Name) string {
+	return SnakeCase(string(name))
 }
 
 func CamelCaseFullName(name protoreflect.FullName) string {
@@ -116,8 +130,4 @@ func Counter(initial int) func() int {
 		i++
 		return i
 	}
-}
-
-func FileName(name string) string {
-	return AppendString(name, extension)
 }

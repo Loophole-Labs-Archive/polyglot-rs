@@ -26,7 +26,7 @@ jobs:
         run: go install protoc-gen-polyglot-rs/protoc-gen-polyglot-rs
       - name: Run generator
         working-directory: ./protoc-gen-polyglot-rs
-        run: protoc --polyglot-rs_out=../ examples/test/test.proto
+        run: protoc --polyglot-rs_out=../ examples/tests/tests.proto
       - name: Run fmt
         run: cargo fmt --all -- --check
       - name: Build
