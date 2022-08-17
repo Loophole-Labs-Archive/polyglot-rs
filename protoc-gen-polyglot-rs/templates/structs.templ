@@ -9,7 +9,7 @@
         {{ range $i, $v := (MakeIterable $.Fields.Len) -}}
             {{ $field := $.Fields.Get $i -}}
             {{ $value := FindValue $field -}}
-            pub(crate) {{ SnakeCaseName $field.Name }}: {{ $value }},
+            pub {{ SnakeCaseName $field.Name }}: {{ $value }},
         {{end -}}
     }
 

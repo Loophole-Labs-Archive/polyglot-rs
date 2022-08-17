@@ -1,12 +1,15 @@
 extern crate polyglot;
 
 mod tests;
+use crate::tests::{
+    Data, Decode, Encode, Request, RequestCorpus, Response, SearchResponse, SearchResponseResult,
+    StockPrices, StockPricesSuperWrap, StockPricesWrapper, Test,
+};
 use serde::Deserialize;
-use std::{fs};
 use std::collections::HashMap;
+use std::fs;
 use std::io::Cursor;
 use std::path::Path;
-use crate::tests::{Data, Decode, Encode, Request, RequestCorpus, Response, SearchResponse, SearchResponseResult, StockPrices, StockPricesSuperWrap, StockPricesWrapper, Test};
 
 #[derive(Debug, Deserialize)]
 struct GeneratorTestData {
@@ -21,9 +24,9 @@ fn get_test_data() -> GeneratorTestData {
                 .join("test")
                 .join("generator-test-data.json"),
         )
-            .unwrap(),
+        .unwrap(),
     )
-        .unwrap()
+    .unwrap();
 }
 
 #[test]
@@ -39,10 +42,17 @@ fn test_encode() {
     let test_b64 = get_test_data();
     let poly_data = base64::decode(test_b64.testall).unwrap();
 
-    let test = tests::TestAll{
-        request: Request { message: "Hello".to_string(), corpus: RequestCorpus::Universal },
-        response: Response { message: "Hello".to_string(), test: Data {
-            message: "Hello".to_string(), checker: Test::Potato }
+    let test = tests::TestAll {
+        request: Request {
+            message: "Hello".to_string(),
+            corpus: RequestCorpus::Universal,
+        },
+        response: Response {
+            message: "Hello".to_string(),
+            test: Data {
+                message: "Hello".to_string(),
+                checker: Test::Potato,
+            },
         },
         search_response: SearchResponse {
             results: Vec::from([SearchResponseResult {
@@ -56,16 +66,18 @@ fn test_encode() {
                 snippets: ["Google is a search engine".to_string()].to_vec(),
             }]),
             snippets: ["Google is a search engine".to_string()].to_vec(),
-            snippets2: ["Google is a search engine".to_string()].to_vec()
+            snippets2: ["Google is a search engine".to_string()].to_vec(),
         },
-        stock_prices_super_wrap: StockPricesSuperWrap { prices: HashMap::from([
-            ("AAPL".to_string(), StockPricesWrapper{
-                s_prices: Vec::from([
-                    StockPrices{
-                        prices: HashMap::from([("price".to_string(), 100.0)])
-                    }
-                ])
-            }),]) },
+        stock_prices_super_wrap: StockPricesSuperWrap {
+            prices: HashMap::from([(
+                "AAPL".to_string(),
+                StockPricesWrapper {
+                    s_prices: Vec::from([StockPrices {
+                        prices: HashMap::from([("price".to_string(), 100.0)]),
+                    }]),
+                },
+            )]),
+        },
     };
 
     let mut encoder: Cursor<Vec<u8>> = Cursor::new(Vec::with_capacity(512));
