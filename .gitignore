@@ -1,10 +1,2 @@
 /target
 /Cargo.lock
-# Default ignored files
-protoc-gen-polyglot-rs/shelf/
-protoc-gen-polyglot-rs/workspace.xml
-# Editor-based HTTP Client requests
-protoc-gen-polyglot-rs/httpRequests/
-# Datasource local storage ignored files
-protoc-gen-polyglot-rs/dataSources/
-protoc-gen-polyglot-rs/dataSources.local.xml
