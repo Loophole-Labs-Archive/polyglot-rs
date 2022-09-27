@@ -179,7 +179,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 if byte < CONTINUATION {
                     return Ok(x | (byte as u16) << s);
                 }
-                x |= (byte as u16&(CONTINUATION as u16)-1) << s;
+                x |= (byte as u16 & (CONTINUATION as u16) - 1) << s;
                 s += 7;
             }
         }
@@ -197,7 +197,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 if byte < CONTINUATION {
                     return Ok(x | (byte as u32) << s);
                 }
-                x |= (byte as u32&(CONTINUATION as u32)-1) << s;
+                x |= (byte as u32 & (CONTINUATION as u32) - 1) << s;
                 s += 7;
             }
         }
@@ -215,7 +215,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 if byte < CONTINUATION {
                     return Ok(x | (byte as u64) << s);
                 }
-                x |= (byte as u64&(CONTINUATION as u64)-1) << s;
+                x |= (byte as u64 & (CONTINUATION as u64) - 1) << s;
                 s += 7;
             }
         }
@@ -232,12 +232,12 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 let byte = self.read_u8().ok().ok_or(DecodingError::InvalidI32)?;
                 if byte < CONTINUATION {
                     let mut x = ((ux | (byte as u32) << s) >> 1) as i32;
-                    if ux&1 != 0 {
+                    if ux & 1 != 0 {
                         x = !x
                     }
                     return Ok(x);
                 }
-                ux |= (byte as u32&(CONTINUATION as u32)-1) << s;
+                ux |= (byte as u32 & (CONTINUATION as u32) - 1) << s;
                 s += 7;
             }
         }
@@ -254,12 +254,12 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 let byte = self.read_u8().ok().ok_or(DecodingError::InvalidI64)?;
                 if byte < CONTINUATION {
                     let mut x = ((ux | (byte as u64) << s) >> 1) as i64;
-                    if ux&1 != 0 {
+                    if ux & 1 != 0 {
                         x = !x
                     }
                     return Ok(x);
                 }
-                ux |= (byte as u64&(CONTINUATION as u64)-1) << s;
+                ux |= (byte as u64 & (CONTINUATION as u64) - 1) << s;
                 s += 7;
             }
         }

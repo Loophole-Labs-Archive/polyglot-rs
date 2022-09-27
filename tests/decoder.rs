@@ -70,9 +70,15 @@ fn test_decode_map() {
     m.insert(String::from("2"), 2);
     m.insert(String::from("3"), 3);
 
-    encoder.encode_map(m.len(), Kind::String, Kind::U32).unwrap();
+    encoder
+        .encode_map(m.len(), Kind::String, Kind::U32)
+        .unwrap();
     for (k, v) in m.clone() {
-        encoder.encode_string(k.as_str()).unwrap().encode_u32(v).unwrap();
+        encoder
+            .encode_string(k.as_str())
+            .unwrap()
+            .encode_u32(v)
+            .unwrap();
     }
 
     let mut decoder = Cursor::new(encoder.get_mut());

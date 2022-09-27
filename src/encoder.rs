@@ -14,29 +14,59 @@
     limitations under the License.
 bv c */
 
-use std::io;
 use crate::kind::Kind;
 use byteorder::{BigEndian, WriteBytesExt};
+use std::io;
 use std::io::{Cursor, Write};
 
 const CONTINUATION: u8 = 0x80;
 
 pub trait Encoder {
-    fn encode_none(self) -> Result<Self, io::Error> where Self: Sized;
-    fn encode_array(self, size: usize, val_kind: Kind) -> Result<Self, io::Error> where Self: Sized;
-    fn encode_map(self, size: usize, key_kind: Kind, val_kind: Kind) -> Result<Self, io::Error> where Self: Sized;
-    fn encode_bytes(self, val: &[u8]) -> Result<Self, io::Error> where Self: Sized;
-    fn encode_string(self, val: &str) -> Result<Self, io::Error> where Self: Sized;
-    fn encode_error(self, val: &str) -> Result<Self, io::Error> where Self: Sized;
-    fn encode_bool(self, val: bool) -> Result<Self, io::Error> where Self: Sized;
-    fn encode_u8(self, val: u8) -> Result<Self, io::Error> where Self: Sized;
-    fn encode_u16(self, val: u16) -> Result<Self, io::Error> where Self: Sized;
-    fn encode_u32(self, val: u32) -> Result<Self, io::Error> where Self: Sized;
-    fn encode_u64(self, val: u64) -> Result<Self, io::Error> where Self: Sized;
-    fn encode_i32(self, val: i32) -> Result<Self, io::Error> where Self: Sized;
-    fn encode_i64(self, val: i64) -> Result<Self, io::Error> where Self: Sized;
-    fn encode_f32(self, val: f32) -> Result<Self, io::Error> where Self: Sized;
-    fn encode_f64(self, val: f64) -> Result<Self, io::Error> where Self: Sized;
+    fn encode_none(self) -> Result<Self, io::Error>
+    where
+        Self: Sized;
+    fn encode_array(self, size: usize, val_kind: Kind) -> Result<Self, io::Error>
+    where
+        Self: Sized;
+    fn encode_map(self, size: usize, key_kind: Kind, val_kind: Kind) -> Result<Self, io::Error>
+    where
+        Self: Sized;
+    fn encode_bytes(self, val: &[u8]) -> Result<Self, io::Error>
+    where
+        Self: Sized;
+    fn encode_string(self, val: &str) -> Result<Self, io::Error>
+    where
+        Self: Sized;
+    fn encode_error(self, val: &str) -> Result<Self, io::Error>
+    where
+        Self: Sized;
+    fn encode_bool(self, val: bool) -> Result<Self, io::Error>
+    where
+        Self: Sized;
+    fn encode_u8(self, val: u8) -> Result<Self, io::Error>
+    where
+        Self: Sized;
+    fn encode_u16(self, val: u16) -> Result<Self, io::Error>
+    where
+        Self: Sized;
+    fn encode_u32(self, val: u32) -> Result<Self, io::Error>
+    where
+        Self: Sized;
+    fn encode_u64(self, val: u64) -> Result<Self, io::Error>
+    where
+        Self: Sized;
+    fn encode_i32(self, val: i32) -> Result<Self, io::Error>
+    where
+        Self: Sized;
+    fn encode_i64(self, val: i64) -> Result<Self, io::Error>
+    where
+        Self: Sized;
+    fn encode_f32(self, val: f32) -> Result<Self, io::Error>
+    where
+        Self: Sized;
+    fn encode_f64(self, val: f64) -> Result<Self, io::Error>
+    where
+        Self: Sized;
 }
 
 impl Encoder for &mut Cursor<Vec<u8>> {
@@ -126,7 +156,6 @@ impl Encoder for &mut Cursor<Vec<u8>> {
         self.write_u8(val as u8)?;
         Ok(self)
     }
-
 
     fn encode_i32(self, val: i32) -> Result<Self, io::Error> {
         self.write_u8(Kind::I32 as u8)?;
