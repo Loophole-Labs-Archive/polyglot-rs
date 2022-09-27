@@ -207,61 +207,79 @@ fn test_encode() {
 
         match td.kind {
             Kind::None => {
-                let val = encoder.encode_none();
+                let val = encoder.encode_none().unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
             }
 
             Kind::Bool => {
-                let val = encoder.encode_bool(td.decoded_value.as_bool().unwrap());
+                let val = encoder
+                    .encode_bool(td.decoded_value.as_bool().unwrap())
+                    .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
             }
 
             Kind::U8 => {
-                let val = encoder.encode_u8(td.decoded_value.as_u64().unwrap() as u8);
+                let val = encoder
+                    .encode_u8(td.decoded_value.as_u64().unwrap() as u8)
+                    .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
             }
 
             Kind::U16 => {
-                let val = encoder.encode_u16(td.decoded_value.as_u64().unwrap() as u16);
+                let val = encoder
+                    .encode_u16(td.decoded_value.as_u64().unwrap() as u16)
+                    .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
             }
 
             Kind::U32 => {
-                let val = encoder.encode_u32(td.decoded_value.as_u64().unwrap() as u32);
+                let val = encoder
+                    .encode_u32(td.decoded_value.as_u64().unwrap() as u32)
+                    .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
             }
 
             Kind::U64 => {
-                let val = encoder.encode_u64(td.decoded_value.as_u64().unwrap());
+                let val = encoder
+                    .encode_u64(td.decoded_value.as_u64().unwrap())
+                    .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
             }
 
             Kind::I32 => {
-                let val = encoder.encode_i32(td.decoded_value.as_i64().unwrap() as i32);
+                let val = encoder
+                    .encode_i32(td.decoded_value.as_i64().unwrap() as i32)
+                    .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
             }
 
             Kind::I64 => {
-                let val = encoder.encode_i64(td.decoded_value.as_i64().unwrap());
+                let val = encoder
+                    .encode_i64(td.decoded_value.as_i64().unwrap())
+                    .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
             }
 
             Kind::F32 => {
-                let val = encoder.encode_f32(td.decoded_value.as_f64().unwrap() as f32);
+                let val = encoder
+                    .encode_f32(td.decoded_value.as_f64().unwrap() as f32)
+                    .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
             }
 
             Kind::F64 => {
-                let val = encoder.encode_f64(td.decoded_value.as_f64().unwrap());
+                let val = encoder
+                    .encode_f64(td.decoded_value.as_f64().unwrap())
+                    .unwrap();
 
                 for (i, expected) in (&td.encoded_value).into_iter().enumerate() {
                     // Ignore last byte; 64-bit float precision
@@ -272,31 +290,36 @@ fn test_encode() {
             }
 
             Kind::Array => {
-                let mut val =
-                    encoder.encode_array(td.decoded_value.as_array().unwrap().len(), Kind::String);
+                let mut val = encoder
+                    .encode_array(td.decoded_value.as_array().unwrap().len(), Kind::String)
+                    .unwrap();
 
                 let expected = td.decoded_value.as_array().unwrap();
 
                 for el in expected.into_iter() {
-                    val = val.encode_string(el.as_str().unwrap());
+                    val = val.encode_string(el.as_str().unwrap()).unwrap();
                 }
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
             }
 
             Kind::Map => {
-                let mut val = encoder.encode_map(
-                    td.decoded_value.as_object().unwrap().len(),
-                    Kind::String,
-                    Kind::U32,
-                );
+                let mut val = encoder
+                    .encode_map(
+                        td.decoded_value.as_object().unwrap().len(),
+                        Kind::String,
+                        Kind::U32,
+                    )
+                    .unwrap();
 
                 let expected = td.decoded_value.as_object().unwrap();
 
                 for (expected_key, expected_value) in expected {
                     val = val
                         .encode_string(&expected_key)
-                        .encode_u32(expected_value.as_u64().unwrap() as u32);
+                        .unwrap()
+                        .encode_u32(expected_value.as_u64().unwrap() as u32)
+                        .unwrap();
                 }
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
@@ -304,19 +327,24 @@ fn test_encode() {
 
             Kind::Bytes => {
                 let val = encoder
-                    .encode_bytes(&base64::decode(td.decoded_value.as_str().unwrap()).unwrap());
+                    .encode_bytes(&base64::decode(td.decoded_value.as_str().unwrap()).unwrap())
+                    .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
             }
 
             Kind::String => {
-                let val = encoder.encode_string(td.decoded_value.as_str().unwrap());
+                let val = encoder
+                    .encode_string(td.decoded_value.as_str().unwrap())
+                    .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
             }
 
             Kind::Error => {
-                let val = encoder.encode_error(td.decoded_value.as_str().unwrap());
+                let val = encoder
+                    .encode_error(td.decoded_value.as_str().unwrap())
+                    .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
             }
