@@ -26,7 +26,7 @@ use std::io::Cursor;
 #[test]
 fn test_decode_nil() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
-    encoder.encode_none();
+    encoder.encode_none().unwrap();
 
     let mut decoder = Cursor::new(encoder.get_mut());
     let val = decoder.decode_none();
@@ -41,9 +41,9 @@ fn test_decode_array() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let m = ["1", "2", "3"];
 
-    encoder.encode_array(m.len(), Kind::String);
+    encoder.encode_array(m.len(), Kind::String).unwrap();
     for i in m {
-        encoder.encode_string(i);
+        encoder.encode_string(i).unwrap();
     }
 
     let mut decoder = Cursor::new(encoder.get_mut());
@@ -70,9 +70,9 @@ fn test_decode_map() {
     m.insert(String::from("2"), 2);
     m.insert(String::from("3"), 3);
 
-    encoder.encode_map(m.len(), Kind::String, Kind::U32);
+    encoder.encode_map(m.len(), Kind::String, Kind::U32).unwrap();
     for (k, v) in m.clone() {
-        encoder.encode_string(k.as_str()).encode_u32(v);
+        encoder.encode_string(k.as_str()).unwrap().encode_u32(v).unwrap();
     }
 
     let mut decoder = Cursor::new(encoder.get_mut());
@@ -95,7 +95,7 @@ fn test_decode_map() {
 fn test_decode_bytes() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = "Test String".as_bytes();
-    encoder.encode_bytes(v);
+    encoder.encode_bytes(v).unwrap();
 
     let mut decoder = Cursor::new(encoder.get_mut());
     let bytes = decoder.decode_bytes().unwrap();
@@ -106,7 +106,7 @@ fn test_decode_bytes() {
 fn test_decode_string() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = "Test String";
-    encoder.encode_string(v);
+    encoder.encode_string(v).unwrap();
 
     let mut decoder = Cursor::new(encoder.get_mut());
     let val = decoder.decode_string().unwrap();
@@ -120,7 +120,7 @@ fn test_decode_string() {
 fn test_decode_error() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = "Test String";
-    encoder.encode_error(v);
+    encoder.encode_error(v).unwrap();
 
     let mut decoder = Cursor::new(encoder.get_mut());
     let val = decoder.decode_error().unwrap();
@@ -133,7 +133,7 @@ fn test_decode_error() {
 #[test]
 fn test_decode_bool() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
-    encoder.encode_bool(true);
+    encoder.encode_bool(true).unwrap();
 
     let mut decoder = Cursor::new(encoder.get_mut());
     let val = decoder.decode_bool().unwrap();
@@ -147,7 +147,7 @@ fn test_decode_bool() {
 fn test_decode_u8() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = 32 as u8;
-    encoder.encode_u8(v);
+    encoder.encode_u8(v).unwrap();
 
     let mut decoder = Cursor::new(encoder.get_mut());
     let val = decoder.decode_u8().unwrap();
@@ -161,7 +161,7 @@ fn test_decode_u8() {
 fn test_decode_u16() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = 1024 as u16;
-    encoder.encode_u16(v);
+    encoder.encode_u16(v).unwrap();
 
     let mut decoder = Cursor::new(encoder.get_mut());
     let val = decoder.decode_u16().unwrap();
@@ -175,7 +175,7 @@ fn test_decode_u16() {
 fn test_decode_u32() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = 4294967290 as u32;
-    encoder.encode_u32(v);
+    encoder.encode_u32(v).unwrap();
 
     let mut decoder = Cursor::new(encoder.get_mut());
     let val = decoder.decode_u32().unwrap();
@@ -189,7 +189,7 @@ fn test_decode_u32() {
 fn test_decode_u64() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = 18446744073709551610 as u64;
-    encoder.encode_u64(v);
+    encoder.encode_u64(v).unwrap();
 
     let mut decoder = Cursor::new(encoder.get_mut());
     let val = decoder.decode_u64().unwrap();
@@ -203,7 +203,7 @@ fn test_decode_u64() {
 fn test_decode_i32() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = -2147483648 as i32;
-    encoder.encode_i32(v);
+    encoder.encode_i32(v).unwrap();
 
     let mut decoder = Cursor::new(encoder.get_mut());
     let val = decoder.decode_i32().unwrap();
@@ -217,7 +217,7 @@ fn test_decode_i32() {
 fn test_decode_i64() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = -9223372036854775808 as i64;
-    encoder.encode_i64(v);
+    encoder.encode_i64(v).unwrap();
 
     let mut decoder = Cursor::new(encoder.get_mut());
     let val = decoder.decode_i64().unwrap();
@@ -231,7 +231,7 @@ fn test_decode_i64() {
 fn test_decode_f32() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = -2147483.648 as f32;
-    encoder.encode_f32(v);
+    encoder.encode_f32(v).unwrap();
 
     let mut decoder = Cursor::new(encoder.get_mut());
     let val = decoder.decode_f32().unwrap();
@@ -245,7 +245,7 @@ fn test_decode_f32() {
 fn test_decode_f64() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = -922337203.477580 as f64;
-    encoder.encode_f64(v);
+    encoder.encode_f64(v).unwrap();
 
     let mut decoder = Cursor::new(encoder.get_mut());
     let val = decoder.decode_f64().unwrap();

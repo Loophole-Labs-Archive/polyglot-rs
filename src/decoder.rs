@@ -40,6 +40,11 @@ pub enum DecodingError {
     InvalidStruct,
 }
 
+const VARINT_LEN16: u16 = 3;
+const VARINT_LEN32: u32 = 5;
+const VARINT_LEN64: u64 = 10;
+const CONTINUATION: u8 = 0x80;
+
 pub trait Decoder {
     fn decode_none(&mut self) -> bool;
     fn decode_array(&mut self, val_kind: Kind) -> Result<usize, DecodingError>;
@@ -166,21 +171,35 @@ impl Decoder for Cursor<&mut Vec<u8>> {
     fn decode_u16(&mut self) -> Result<u16, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidU16)?;
         if kind == Kind::U16 as u8 {
-            return self
-                .read_u16::<BigEndian>()
-                .ok()
-                .ok_or(DecodingError::InvalidU16);
+            let mut x: u16 = 0;
+            let mut s: u32 = 0;
+
+            for _ in 0..VARINT_LEN16 {
+                let byte = self.read_u8().ok().ok_or(DecodingError::InvalidU16)?;
+                if byte < CONTINUATION {
+                    return Ok(x | (byte as u16) << s);
+                }
+                x |= (byte as u16&(CONTINUATION as u16)-1) << s;
+                s += 7;
+            }
         }
-        Err(DecodingError::InvalidU16)
+        Err(DecodingError::InvalidU32)
     }
 
     fn decode_u32(&mut self) -> Result<u32, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidU32)?;
         if kind == Kind::U32 as u8 {
-            return self
-                .read_u32::<BigEndian>()
-                .ok()
-                .ok_or(DecodingError::InvalidU32);
+            let mut x: u32 = 0;
+            let mut s: u32 = 0;
+
+            for _ in 0..VARINT_LEN32 {
+                let byte = self.read_u8().ok().ok_or(DecodingError::InvalidU32)?;
+                if byte < CONTINUATION {
+                    return Ok(x | (byte as u32) << s);
+                }
+                x |= (byte as u32&(CONTINUATION as u32)-1) << s;
+                s += 7;
+            }
         }
         Err(DecodingError::InvalidU32)
     }
@@ -188,21 +207,39 @@ impl Decoder for Cursor<&mut Vec<u8>> {
     fn decode_u64(&mut self) -> Result<u64, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidU64)?;
         if kind == Kind::U64 as u8 {
-            return self
-                .read_u64::<BigEndian>()
-                .ok()
-                .ok_or(DecodingError::InvalidU64);
+            let mut x: u64 = 0;
+            let mut s: u32 = 0;
+
+            for _ in 0..VARINT_LEN64 {
+                let byte = self.read_u8().ok().ok_or(DecodingError::InvalidU64)?;
+                if byte < CONTINUATION {
+                    return Ok(x | (byte as u64) << s);
+                }
+                x |= (byte as u64&(CONTINUATION as u64)-1) << s;
+                s += 7;
+            }
         }
-        Err(DecodingError::InvalidU64)
+        Err(DecodingError::InvalidU32)
     }
 
     fn decode_i32(&mut self) -> Result<i32, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidI32)?;
         if kind == Kind::I32 as u8 {
-            return self
-                .read_i32::<BigEndian>()
-                .ok()
-                .ok_or(DecodingError::InvalidI32);
+            let mut ux: u32 = 0;
+            let mut s: u32 = 0;
+
+            for _ in 0..VARINT_LEN32 {
+                let byte = self.read_u8().ok().ok_or(DecodingError::InvalidI32)?;
+                if byte < CONTINUATION {
+                    let mut x = ((ux | (byte as u32) << s) >> 1) as i32;
+                    if ux&1 != 0 {
+                        x = !x
+                    }
+                    return Ok(x);
+                }
+                ux |= (byte as u32&(CONTINUATION as u32)-1) << s;
+                s += 7;
+            }
         }
         Err(DecodingError::InvalidI32)
     }
@@ -210,10 +247,21 @@ impl Decoder for Cursor<&mut Vec<u8>> {
     fn decode_i64(&mut self) -> Result<i64, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidI64)?;
         if kind == Kind::I64 as u8 {
-            return self
-                .read_i64::<BigEndian>()
-                .ok()
-                .ok_or(DecodingError::InvalidI64);
+            let mut ux: u64 = 0;
+            let mut s: u32 = 0;
+
+            for _ in 0..VARINT_LEN64 {
+                let byte = self.read_u8().ok().ok_or(DecodingError::InvalidI64)?;
+                if byte < CONTINUATION {
+                    let mut x = ((ux | (byte as u64) << s) >> 1) as i64;
+                    if ux&1 != 0 {
+                        x = !x
+                    }
+                    return Ok(x);
+                }
+                ux |= (byte as u64&(CONTINUATION as u64)-1) << s;
+                s += 7;
+            }
         }
         Err(DecodingError::InvalidI64)
     }

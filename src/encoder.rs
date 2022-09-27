@@ -12,140 +12,167 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-*/
+bv c */
 
+use std::io;
 use crate::kind::Kind;
 use byteorder::{BigEndian, WriteBytesExt};
 use std::io::{Cursor, Write};
 
+const CONTINUATION: u8 = 0x80;
+
 pub trait Encoder {
-    fn encode_none(self) -> Self;
-    fn encode_array(self, size: usize, val_kind: Kind) -> Self;
-    fn encode_map(self, size: usize, key_kind: Kind, val_kind: Kind) -> Self;
-    fn encode_bytes(self, val: &[u8]) -> Self;
-    fn encode_string(self, val: &str) -> Self;
-    fn encode_error(self, val: &str) -> Self;
-    fn encode_bool(self, val: bool) -> Self;
-    fn encode_u8(self, val: u8) -> Self;
-    fn encode_u16(self, val: u16) -> Self;
-    fn encode_u32(self, val: u32) -> Self;
-    fn encode_u64(self, val: u64) -> Self;
-    fn encode_i32(self, val: i32) -> Self;
-    fn encode_i64(self, val: i64) -> Self;
-    fn encode_f32(self, val: f32) -> Self;
-    fn encode_f64(self, val: f64) -> Self;
+    fn encode_none(self) -> Result<Self, io::Error> where Self: Sized;
+    fn encode_array(self, size: usize, val_kind: Kind) -> Result<Self, io::Error> where Self: Sized;
+    fn encode_map(self, size: usize, key_kind: Kind, val_kind: Kind) -> Result<Self, io::Error> where Self: Sized;
+    fn encode_bytes(self, val: &[u8]) -> Result<Self, io::Error> where Self: Sized;
+    fn encode_string(self, val: &str) -> Result<Self, io::Error> where Self: Sized;
+    fn encode_error(self, val: &str) -> Result<Self, io::Error> where Self: Sized;
+    fn encode_bool(self, val: bool) -> Result<Self, io::Error> where Self: Sized;
+    fn encode_u8(self, val: u8) -> Result<Self, io::Error> where Self: Sized;
+    fn encode_u16(self, val: u16) -> Result<Self, io::Error> where Self: Sized;
+    fn encode_u32(self, val: u32) -> Result<Self, io::Error> where Self: Sized;
+    fn encode_u64(self, val: u64) -> Result<Self, io::Error> where Self: Sized;
+    fn encode_i32(self, val: i32) -> Result<Self, io::Error> where Self: Sized;
+    fn encode_i64(self, val: i64) -> Result<Self, io::Error> where Self: Sized;
+    fn encode_f32(self, val: f32) -> Result<Self, io::Error> where Self: Sized;
+    fn encode_f64(self, val: f64) -> Result<Self, io::Error> where Self: Sized;
 }
 
 impl Encoder for &mut Cursor<Vec<u8>> {
-    #[must_use]
-    fn encode_none(self) -> Self {
+    fn encode_none(self) -> Result<Self, io::Error> {
         self.write_u8(Kind::None as u8).unwrap();
-        self
+        Ok(self)
     }
 
-    #[must_use]
-    fn encode_array(self, size: usize, val_kind: Kind) -> Self {
-        self.write_u8(Kind::Array as u8).unwrap();
-        self.write_u8(val_kind as u8).unwrap();
+    fn encode_array(self, size: usize, val_kind: Kind) -> Result<Self, io::Error> {
+        self.write_u8(Kind::Array as u8)?;
+        self.write_u8(val_kind as u8)?;
         self.encode_u32(size as u32)
     }
 
-    #[must_use]
-    fn encode_map(self, size: usize, key_kind: Kind, val_kind: Kind) -> Self {
-        self.write_u8(Kind::Map as u8).unwrap();
-        self.write_u8(key_kind as u8).unwrap();
-        self.write_u8(val_kind as u8).unwrap();
-        self.encode_u32(size as u32);
-        self
+    fn encode_map(self, size: usize, key_kind: Kind, val_kind: Kind) -> Result<Self, io::Error> {
+        self.write_u8(Kind::Map as u8)?;
+        self.write_u8(key_kind as u8)?;
+        self.write_u8(val_kind as u8)?;
+        self.encode_u32(size as u32)
     }
 
-    #[must_use]
-    fn encode_bytes(self, val: &[u8]) -> Self {
-        self.write_u8(Kind::Bytes as u8).unwrap();
-        self.encode_u32(val.len() as u32);
-        self.write_all(val).unwrap();
-        self
+    fn encode_bytes(self, val: &[u8]) -> Result<Self, io::Error> {
+        self.write_u8(Kind::Bytes as u8)?;
+        self.encode_u32(val.len() as u32)?;
+        self.write_all(val)?;
+        Ok(self)
     }
 
-    #[must_use]
-    fn encode_string(self, val: &str) -> Self {
+    fn encode_string(self, val: &str) -> Result<Self, io::Error> {
         let b = val.as_bytes();
-        self.write_u8(Kind::String as u8).unwrap();
-        self.encode_u32(b.len() as u32);
-        self.write_all(b).unwrap();
-        self
+        self.write_u8(Kind::String as u8)?;
+        self.encode_u32(b.len() as u32)?;
+        self.write_all(b)?;
+        Ok(self)
     }
 
-    #[must_use]
-    fn encode_error(self, val: &str) -> Self {
+    fn encode_error(self, val: &str) -> Result<Self, io::Error> {
         let b = val.as_bytes();
-        self.write_u8(Kind::Error as u8).unwrap();
-        self.write_u8(Kind::String as u8).unwrap();
-        self.encode_u32(b.len() as u32);
-        self.write_all(b).unwrap();
-        self
+        self.write_u8(Kind::Error as u8)?;
+        self.write_u8(Kind::String as u8)?;
+        self.encode_u32(b.len() as u32)?;
+        self.write_all(b)?;
+        Ok(self)
     }
 
-    #[must_use]
-    fn encode_bool(self, val: bool) -> Self {
-        self.write_u8(Kind::Bool as u8).unwrap();
-        self.write_u8(val as u8).unwrap();
-        self
+    fn encode_bool(self, val: bool) -> Result<Self, io::Error> {
+        self.write_u8(Kind::Bool as u8)?;
+        self.write_u8(val as u8)?;
+        Ok(self)
     }
 
-    #[must_use]
-    fn encode_u8(self, val: u8) -> Self {
-        self.write_u8(Kind::U8 as u8).unwrap();
-        self.write_u8(val).unwrap();
-        self
+    fn encode_u8(self, val: u8) -> Result<Self, io::Error> {
+        self.write_u8(Kind::U8 as u8)?;
+        self.write_u8(val)?;
+        Ok(self)
     }
 
-    #[must_use]
-    fn encode_u16(self, val: u16) -> Self {
-        self.write_u8(Kind::U16 as u8).unwrap();
-        self.write_u16::<BigEndian>(val).unwrap();
-        self
+    fn encode_u16(self, val: u16) -> Result<Self, io::Error> {
+        let mut val = val;
+        self.write_u8(Kind::U16 as u8)?;
+        while val >= CONTINUATION as u16 {
+            self.write_u8(val as u8 | CONTINUATION)?;
+            val >>= 7;
+        }
+        self.write_u8(val as u8)?;
+        Ok(self)
     }
 
-    #[must_use]
-    fn encode_u32(self, val: u32) -> Self {
-        self.write_u8(Kind::U32 as u8).unwrap();
-        self.write_u32::<BigEndian>(val).unwrap();
-        self
+    fn encode_u32(self, val: u32) -> Result<Self, io::Error> {
+        let mut val = val;
+        self.write_u8(Kind::U32 as u8)?;
+        while val >= CONTINUATION as u32 {
+            self.write_u8(val as u8 | CONTINUATION)?;
+            val >>= 7;
+        }
+        self.write_u8(val as u8)?;
+        Ok(self)
     }
 
-    #[must_use]
-    fn encode_u64(self, val: u64) -> Self {
-        self.write_u8(Kind::U64 as u8).unwrap();
-        self.write_u64::<BigEndian>(val).unwrap();
-        self
+    fn encode_u64(self, val: u64) -> Result<Self, io::Error> {
+        let mut val = val;
+        self.write_u8(Kind::U64 as u8)?;
+        while val >= CONTINUATION as u64 {
+            self.write_u8(val as u8 | CONTINUATION)?;
+            val >>= 7;
+        }
+        self.write_u8(val as u8)?;
+        Ok(self)
     }
 
-    #[must_use]
-    fn encode_i32(self, val: i32) -> Self {
-        self.write_u8(Kind::I32 as u8).unwrap();
-        self.write_i32::<BigEndian>(val).unwrap();
-        self
+
+    fn encode_i32(self, val: i32) -> Result<Self, io::Error> {
+        self.write_u8(Kind::I32 as u8)?;
+
+        // Shift the value to the left by 1 bit, then flip the bits if the value is negative.
+        let mut cast_val = (val as u32) << 1;
+        if val < 0 {
+            cast_val = !cast_val;
+        }
+
+        while cast_val >= CONTINUATION as u32 {
+            // Append the lower 7 bits of the value, then shift the value to the right by 7 bits.
+            self.write_u8(cast_val as u8 | CONTINUATION)?;
+            cast_val >>= 7;
+        }
+        self.write_u8(cast_val as u8)?;
+        Ok(self)
     }
 
-    #[must_use]
-    fn encode_i64(self, val: i64) -> Self {
-        self.write_u8(Kind::I64 as u8).unwrap();
-        self.write_i64::<BigEndian>(val).unwrap();
-        self
+    fn encode_i64(self, val: i64) -> Result<Self, io::Error> {
+        self.write_u8(Kind::I64 as u8)?;
+
+        // Shift the value to the left by 1 bit, then flip the bits if the value is negative.
+        let mut cast_val = (val as u64) << 1;
+        if val < 0 {
+            cast_val = !cast_val;
+        }
+
+        while cast_val >= CONTINUATION as u64 {
+            // Append the lower 7 bits of the value, then shift the value to the right by 7 bits.
+            self.write_u8(cast_val as u8 | CONTINUATION)?;
+            cast_val >>= 7;
+        }
+        self.write_u8(cast_val as u8)?;
+        Ok(self)
     }
 
-    #[must_use]
-    fn encode_f32(self, val: f32) -> Self {
-        self.write_u8(Kind::F32 as u8).unwrap();
-        self.write_f32::<BigEndian>(val).unwrap();
-        self
+    fn encode_f32(self, val: f32) -> Result<Self, io::Error> {
+        self.write_u8(Kind::F32 as u8)?;
+        self.write_f32::<BigEndian>(val)?;
+        Ok(self)
     }
 
-    #[must_use]
-    fn encode_f64(self, val: f64) -> Self {
-        self.write_u8(Kind::F64 as u8).unwrap();
-        self.write_f64::<BigEndian>(val).unwrap();
-        self
+    fn encode_f64(self, val: f64) -> Result<Self, io::Error> {
+        self.write_u8(Kind::F64 as u8)?;
+        self.write_f64::<BigEndian>(val)?;
+        Ok(self)
     }
 }
