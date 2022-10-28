@@ -1,8 +1,12 @@
 {{define "imports"}}
 use std::io::Cursor;
 use polyglot::{DecodingError, Encoder, Decoder, Kind};
+{{ if .dependencies.Enums -}}
 use num_enum::TryFromPrimitive;
 use std::convert::TryFrom;
+{{ end -}}
+{{ if .dependencies.Maps -}}
 use std::collections::HashMap;
+{{ end -}}
 use std::io;
 {{end}}

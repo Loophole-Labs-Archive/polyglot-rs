@@ -120,6 +120,8 @@ func (g *Generator) ExecuteTemplate(
 	header bool,
 ) error {
 	var buf bytes.Buffer
+	deps := DependencyAnalysis(protoFile)
+
 	err := g.templ.ExecuteTemplate(&buf, "base.templ", map[string]interface{}{
 		"pluginVersion":   version.Version,
 		"sourcePath":      protoFile.Desc.Path(),
@@ -128,6 +130,7 @@ func (g *Generator) ExecuteTemplate(
 		"enums":           protoFile.Desc.Enums(),
 		"messages":        protoFile.Desc.Messages(),
 		"header":          header,
+		"dependencies":    deps,
 	})
 	if err != nil {
 		return err

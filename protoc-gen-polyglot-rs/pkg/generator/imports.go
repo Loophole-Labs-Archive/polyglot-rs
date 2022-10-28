@@ -16,9 +16,57 @@
 
 package generator
 
+import (
+	"google.golang.org/protobuf/compiler/protogen"
+	"google.golang.org/protobuf/reflect/protoreflect"
+)
+
 var (
 	requiredImports = []string{
 		"github.com/loopholelabs/polyglot-go",
 		"errors",
 	}
 )
+
+type Dependencies struct {
+	Enums bool
+	Maps  bool
+}
+
+func DependencyAnalysis(file *protogen.File) *Dependencies {
+	dependencies := &Dependencies{
+		Enums: false,
+		Maps:  false,
+	}
+
+	if len(file.Enums) > 0 {
+		dependencies.Enums = true
+	}
+	for _, message := range file.Messages {
+		for _, field := range message.Fields {
+			if field.Desc.Kind() == protoreflect.MessageKind {
+				if field.Desc.Message().IsMapEntry() {
+					dependencies.Maps = true
+				}
+				if field.Desc.Message().Fields().Len() > 0 {
+					dependencies = traverseFields(field.Message, dependencies)
+				}
+			}
+		}
+	}
+	return dependencies
+}
+
+func traverseFields(message *protogen.Message, dependencies *Dependencies) *Dependencies {
+	for _, field := range message.Fields {
+		if field.Desc.Kind() == protoreflect.MessageKind {
+			if field.Desc.Message().IsMapEntry() {
+				dependencies.Maps = true
+			}
+			if field.Desc.Message().Fields().Len() > 0 {
+				dependencies = traverseFields(field.Message, dependencies)
+			}
+		}
+	}
+	return dependencies
+}
