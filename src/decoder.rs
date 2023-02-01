@@ -93,7 +93,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 Ok(val) => Ok(val as usize),
             };
         }
-
+        self.set_position(self.position() - 1);
         Err(DecodingError::InvalidU32)
     }
 
@@ -110,6 +110,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 Ok(val) => Ok(val as usize),
             };
         }
+        self.set_position(self.position() - 1);
         Err(DecodingError::InvalidMap)
     }
 
@@ -123,12 +124,12 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 .ok_or(DecodingError::InvalidBytes)?;
             return Ok(buf);
         }
+        self.set_position(self.position() - 1);
         Err(DecodingError::InvalidBytes)
     }
 
     fn decode_string(&mut self) -> Result<String, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidString)?;
-
         if kind == Kind::String as u8 {
             let size = self.decode_u32()? as usize;
             let mut str_buf = vec![0u8; size];
@@ -141,6 +142,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 .ok_or(DecodingError::InvalidString)?;
             return Ok(result.to_owned());
         }
+        self.set_position(self.position() - 1);
         Err(DecodingError::InvalidString)
     }
 
@@ -159,6 +161,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 .ok_or(DecodingError::InvalidError)?;
             return Ok(Box::<dyn Error>::from(result.to_owned()));
         }
+        self.set_position(self.position() - 2);
         Err(DecodingError::InvalidError)
     }
 
@@ -168,6 +171,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
             let val = self.read_u8().ok().ok_or(DecodingError::InvalidBool)?;
             return Ok(val == 1);
         }
+        self.set_position(self.position() - 1);
         Err(DecodingError::InvalidBool)
     }
 
@@ -176,6 +180,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
         if kind == Kind::U8 as u8 {
             return self.read_u8().ok().ok_or(DecodingError::InvalidU8);
         }
+        self.set_position(self.position() - 1);
         Err(DecodingError::InvalidU8)
     }
 
@@ -194,6 +199,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 s += 7;
             }
         }
+        self.set_position(self.position() - 1);
         Err(DecodingError::InvalidU32)
     }
 
@@ -212,6 +218,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 s += 7;
             }
         }
+        self.set_position(self.position() - 1);
         Err(DecodingError::InvalidU32)
     }
 
@@ -230,6 +237,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 s += 7;
             }
         }
+        self.set_position(self.position() - 1);
         Err(DecodingError::InvalidU32)
     }
 
@@ -252,6 +260,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 s += 7;
             }
         }
+        self.set_position(self.position() - 1);
         Err(DecodingError::InvalidI32)
     }
 
@@ -274,6 +283,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 s += 7;
             }
         }
+        self.set_position(self.position() - 1);
         Err(DecodingError::InvalidI64)
     }
 
@@ -285,6 +295,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 .ok()
                 .ok_or(DecodingError::InvalidF32);
         }
+        self.set_position(self.position() - 1);
         Err(DecodingError::InvalidF32)
     }
 
@@ -296,6 +307,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 .ok()
                 .ok_or(DecodingError::InvalidF64);
         }
+        self.set_position(self.position() - 1);
         Err(DecodingError::InvalidF64)
     }
 }
