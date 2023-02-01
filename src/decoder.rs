@@ -16,10 +16,10 @@
 
 use crate::kind::Kind;
 use byteorder::{BigEndian, ReadBytesExt};
-use std::io::{Cursor, Read};
-use std::str;
 use std::error::Error;
 use std::fmt::{Display, Formatter};
+use std::io::{Cursor, Read};
+use std::str;
 
 #[derive(Debug, PartialEq)]
 pub enum DecodingError {
@@ -48,9 +48,7 @@ impl Display for DecodingError {
     }
 }
 
-impl Error for DecodingError {
-
-}
+impl Error for DecodingError {}
 
 const VARINT_LEN16: u16 = 3;
 const VARINT_LEN32: u32 = 5;
@@ -159,7 +157,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
             let result = str::from_utf8(&*str_buf)
                 .ok()
                 .ok_or(DecodingError::InvalidError)?;
-            return Ok(Box::<dyn Error>::from(result.to_owned()))
+            return Ok(Box::<dyn Error>::from(result.to_owned()));
         }
         Err(DecodingError::InvalidError)
     }

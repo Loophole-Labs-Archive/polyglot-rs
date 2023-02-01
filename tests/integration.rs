@@ -16,12 +16,12 @@
 
 extern crate polyglot;
 
-use std::error::Error;
 use polyglot::Decoder;
 use polyglot::Encoder;
 use polyglot::Kind;
 use serde::Deserialize;
 use serde_json::Value;
+use std::error::Error;
 use std::fs;
 use std::io::Cursor;
 use std::path::Path;

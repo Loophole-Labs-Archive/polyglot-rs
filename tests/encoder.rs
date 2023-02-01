@@ -16,9 +16,9 @@
 
 extern crate polyglot;
 
-use std::error::Error;
 use polyglot::Encoder;
 use polyglot::Kind;
+use std::error::Error;
 use std::io::Cursor;
 
 #[test]
