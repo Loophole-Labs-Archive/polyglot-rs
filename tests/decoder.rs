@@ -21,6 +21,7 @@ use polyglot::DecodingError;
 use polyglot::Encoder;
 use polyglot::Kind;
 use std::collections::HashMap;
+use std::error::Error;
 use std::io::Cursor;
 
 #[test]
@@ -126,11 +127,11 @@ fn test_decode_string() {
 fn test_decode_error() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = "Test String";
-    encoder.encode_error(v).unwrap();
+    encoder.encode_error(Box::<dyn Error>::from(v)).unwrap();
 
     let mut decoder = Cursor::new(encoder.get_mut());
     let val = decoder.decode_error().unwrap();
-    assert_eq!(val, v);
+    assert_eq!(val.to_string(), v);
 
     let error = decoder.decode_error().unwrap_err();
     assert_eq!(error, DecodingError::InvalidError);
