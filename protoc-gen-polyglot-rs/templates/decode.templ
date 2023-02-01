@@ -1,15 +1,19 @@
 {{define "decode"}}
 
 impl Decode for {{ CamelCase .FullName }} {
-    fn decode (b: &mut Cursor<&mut Vec<u8>>) -> Result<Option<{{ CamelCase .FullName }}>, DecodingError> {
+    fn decode (b: &mut Cursor<&mut Vec<u8>>) -> Result<Option<{{ CamelCase .FullName }}>, Box<dyn std::error::Error>> {
         if b.decode_none() {
             return Ok(None);
+        }
+
+        if let Ok(error) = b.decode_error() {
+            return Err(error);
         }
 
         {{ $decoding := GetDecodingFields .Fields -}}
         {{ range $field := $decoding.SliceFields -}}
         {{ $val := FindValue $field }}
-        fn {{ SnakeCaseName .Name }}_decode(b: &mut Cursor<&mut Vec<u8>>) -> Result<Option<{{ $val }}>, DecodingError> {
+        fn {{ SnakeCaseName .Name }}_decode(b: &mut Cursor<&mut Vec<u8>>) -> Result<Option<{{ $val }}>, Box<dyn std::error::Error>> {
             {{ $kind := GetKind $field.Kind -}}
             {{ $decoder := GetLUTDecoder $field.Kind -}}
 

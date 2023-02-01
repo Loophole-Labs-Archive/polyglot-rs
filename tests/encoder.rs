@@ -16,6 +16,7 @@
 
 extern crate polyglot;
 
+use std::error::Error;
 use polyglot::Encoder;
 use polyglot::Kind;
 use std::io::Cursor;
@@ -76,7 +77,7 @@ fn test_encode_string() {
 fn test_encode_error() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
     let v = "Test Error";
-    encoder.encode_error(v).unwrap();
+    encoder.encode_error(Box::<dyn Error>::from(v)).unwrap();
     assert_eq!(encoder.position() as usize, 1 + 1 + 1 + 1 + v.len());
     assert_eq!(
         encoder.get_ref()[1 + 1 + 1 + 1..].to_owned(),
