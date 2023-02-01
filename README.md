@@ -25,6 +25,6 @@ Everyone interacting in the Polyglot project’s codebases, issue trackers, chat
 
 [![https://loopholelabs.io][loopholelabs]](https://loopholelabs.io)
 
-[gitrepo]: https://github.com/loopholelabs/polyglot-go
+[gitrepo]: https://github.com/loopholelabs/polyglot-rs
 [loopholelabs]: https://cdn.loopholelabs.io/loopholelabs/LoopholeLabsLogo.svg
 [loophomepage]: https://loopholelabs.io
