@@ -61,7 +61,7 @@ pub trait Decoder {
     fn decode_map(&mut self, key_kind: Kind, val_kind: Kind) -> Result<usize, DecodingError>;
     fn decode_bytes(&mut self) -> Result<Vec<u8>, DecodingError>;
     fn decode_string(&mut self) -> Result<String, DecodingError>;
-    fn decode_error(&mut self) -> Result<Box<dyn std::error::Error>, DecodingError>;
+    fn decode_error(&mut self) -> Result<Box<dyn Error>, DecodingError>;
     fn decode_bool(&mut self) -> Result<bool, DecodingError>;
     fn decode_u8(&mut self) -> Result<u8, DecodingError>;
     fn decode_u16(&mut self) -> Result<u16, DecodingError>;
@@ -138,7 +138,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 .ok()
                 .ok_or(DecodingError::InvalidString)?;
 
-            let result = str::from_utf8(&*str_buf)
+            let result = str::from_utf8(&str_buf)
                 .ok()
                 .ok_or(DecodingError::InvalidString)?;
             return Ok(result.to_owned());
@@ -147,7 +147,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
         Err(DecodingError::InvalidString)
     }
 
-    fn decode_error(&mut self) -> Result<Box<dyn std::error::Error>, DecodingError> {
+    fn decode_error(&mut self) -> Result<Box<dyn Error>, DecodingError> {
         let kind = self.read_u8().ok().ok_or(DecodingError::InvalidError)?;
         let nested_kind = self.read_u8().ok().ok_or(DecodingError::InvalidError)?;
         if kind == Kind::Error as u8 && nested_kind == Kind::String as u8 {
@@ -157,7 +157,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 .ok()
                 .ok_or(DecodingError::InvalidError)?;
 
-            let result = str::from_utf8(&*str_buf)
+            let result = str::from_utf8(&str_buf)
                 .ok()
                 .ok_or(DecodingError::InvalidError)?;
             return Ok(Box::<dyn Error>::from(result.to_owned()));
@@ -196,7 +196,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 if byte < CONTINUATION {
                     return Ok(x | (byte as u16) << s);
                 }
-                x |= (byte as u16 & (CONTINUATION as u16) - 1) << s;
+                x |= (byte as u16 & ((CONTINUATION as u16) - 1)) << s;
                 s += 7;
             }
         }
@@ -215,7 +215,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 if byte < CONTINUATION {
                     return Ok(x | (byte as u32) << s);
                 }
-                x |= (byte as u32 & (CONTINUATION as u32) - 1) << s;
+                x |= (byte as u32 & ((CONTINUATION as u32) - 1)) << s;
                 s += 7;
             }
         }
@@ -234,7 +234,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                 if byte < CONTINUATION {
                     return Ok(x | (byte as u64) << s);
                 }
-                x |= (byte as u64 & (CONTINUATION as u64) - 1) << s;
+                x |= (byte as u64 & ((CONTINUATION as u64) - 1)) << s;
                 s += 7;
             }
         }
@@ -257,7 +257,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                     }
                     return Ok(x);
                 }
-                ux |= (byte as u32 & (CONTINUATION as u32) - 1) << s;
+                ux |= (byte as u32 & ((CONTINUATION as u32) - 1)) << s;
                 s += 7;
             }
         }
@@ -280,7 +280,7 @@ impl Decoder for Cursor<&mut Vec<u8>> {
                     }
                     return Ok(x);
                 }
-                ux |= (byte as u64 & (CONTINUATION as u64) - 1) << s;
+                ux |= (byte as u64 & ((CONTINUATION as u64) - 1)) << s;
                 s += 7;
             }
         }
