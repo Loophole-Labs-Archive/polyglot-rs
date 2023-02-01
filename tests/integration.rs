@@ -21,6 +21,7 @@ use polyglot::Encoder;
 use polyglot::Kind;
 use serde::Deserialize;
 use serde_json::Value;
+use std::error::Error;
 use std::fs;
 use std::io::Cursor;
 use std::path::Path;
@@ -190,7 +191,7 @@ fn test_decode() {
             Kind::Error => {
                 let val = decoder.decode_error().unwrap();
 
-                assert_eq!(val, td.decoded_value.as_str().unwrap());
+                assert_eq!(val.to_string(), td.decoded_value.as_str().unwrap());
             }
 
             _ => panic!("Unimplemented decoder for test {}", td.name),
@@ -343,7 +344,7 @@ fn test_encode() {
 
             Kind::Error => {
                 let val = encoder
-                    .encode_error(td.decoded_value.as_str().unwrap())
+                    .encode_error(Box::<dyn Error>::from(td.decoded_value.as_str().unwrap()))
                     .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);

@@ -74,14 +74,17 @@ func CamelCase(s string) string {
 
 func SnakeCase(s string) string {
 	var b bytes.Buffer
+	var consc bool
 	for _, c := range s {
 		if 'A' <= c && c <= 'Z' {
-			if b.Len() > 0 {
+			if b.Len() > 0 && !consc {
 				b.WriteRune('_')
 			}
 			b.WriteRune(c - 'A' + 'a')
+			consc = true
 		} else {
 			b.WriteRune(c)
+			consc = false
 		}
 	}
 	return b.String()

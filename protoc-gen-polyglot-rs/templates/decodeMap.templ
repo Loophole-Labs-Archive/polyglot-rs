@@ -1,7 +1,7 @@
 {{define "decodeMap"}}
 {{ $mapKeyValue := FindValue .MapKey }}
 {{ $mapValueValue := FindValue .MapValue }}
-fn {{ .Name }}_decode(b: &mut Cursor<&mut Vec<u8>>) -> Result<Option<HashMap<{{ $mapKeyValue }}, {{ $mapValueValue }}>>, DecodingError> {
+fn {{ SnakeCaseName .Name }}_decode(b: &mut Cursor<&mut Vec<u8>>) -> Result<Option<HashMap<{{ $mapKeyValue }}, {{ $mapValueValue }}>>, Box<dyn std::error::Error>> {
     if b.decode_none() {
         return Ok(None);
     }
