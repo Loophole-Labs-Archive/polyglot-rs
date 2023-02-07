@@ -106,7 +106,7 @@ impl Encoder for &mut Cursor<Vec<u8>> {
         self,
         size: usize,
         key_kind: Kind,
-        val_kind: Kind
+        val_kind: Kind,
     ) -> Result<Self, EncodingError> {
         self.write_u8(Kind::Map as u8)?;
         self.write_u8(key_kind as u8)?;
