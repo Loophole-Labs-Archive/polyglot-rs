@@ -23,7 +23,7 @@ jobs:
       - name: Install polyglot plugin for protoc-gen
         run: go install ./protoc-gen-rs-polyglot
       - name: Run generator
-        run: protoc --rs_polyglot_out=privacy=public:./ examples/tests/tests.proto
+        run: protoc --rs-polyglot_out=privacy=public:./ examples/tests/tests.proto
       - name: Run fmt
         run: cargo fmt --all -- --check
       - name: Build
