@@ -7,6 +7,12 @@ license = "Apache-2.0"
 repository = "https://github.com/loopholelabs/polyglot-rs"
 readme = "README.md"
 keywords = ["polyglot", "serialization", "deserialization", "encoding", "decoding", "byte buffer", "rpc"]
+exclude = [
+    "**/*.go",
+    "**/*.templ",
+    "go.mod",
+    "go.sum",
+]
 
 [lib]
 path = "src/lib.rs"
