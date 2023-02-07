@@ -14,10 +14,10 @@
     limitations under the License.
 bv c */
 
-use std::error::Error;
-use std::fmt::{Display, Formatter};
 use crate::kind::Kind;
 use byteorder::{BigEndian, WriteBytesExt};
+use std::error::Error;
+use std::fmt::{Display, Formatter};
 use std::io;
 use std::io::{Cursor, Write};
 
@@ -25,7 +25,7 @@ const CONTINUATION: u8 = 0x80;
 
 #[derive(Debug, PartialEq)]
 pub enum EncodingError {
-    WriteFailed
+    WriteFailed,
 }
 
 impl Display for EncodingError {
