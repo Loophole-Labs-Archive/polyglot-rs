@@ -102,7 +102,12 @@ impl Encoder for &mut Cursor<Vec<u8>> {
         self.encode_u32(size as u32)
     }
 
-    fn encode_map(self, size: usize, key_kind: Kind, val_kind: Kind) -> Result<Self, EncodingError> {
+    fn encode_map(
+        self,
+        size: usize,
+        key_kind: Kind,
+        val_kind: Kind
+    ) -> Result<Self, EncodingError> {
         self.write_u8(Kind::Map as u8)?;
         self.write_u8(key_kind as u8)?;
         self.write_u8(val_kind as u8)?;
@@ -129,7 +134,9 @@ impl Encoder for &mut Cursor<Vec<u8>> {
         self.write_u8(Kind::Error as u8)?;
         self.write_u8(Kind::String as u8)?;
         self.encode_u32(b.len() as u32)?;
-        self.write_all(b.as_slice()).ok().ok_or(EncodingError::WriteFailed)?;
+        self.write_all(b.as_slice())
+            .ok()
+            .ok_or(EncodingError::WriteFailed)?;
         Ok(self)
     }
 
