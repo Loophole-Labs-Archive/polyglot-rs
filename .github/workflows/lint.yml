@@ -17,13 +17,13 @@ jobs:
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
       - name: Install protoc-gen plugin
-        working-directory: ./protoc-gen-polyglot-rs
+        working-directory: ./protoc-gen-rs-polyglot
         run: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
       - name: Install polyglot plugin for protoc-gen
-        working-directory: ./protoc-gen-polyglot-rs
-        run: go install protoc-gen-polyglot-rs/protoc-gen-polyglot-rs
+        working-directory: ./protoc-gen-rs-polyglot
+        run: go install protoc-gen-rs-polyglot/protoc-gen-rs-polyglot
       - name: Run generator
-        working-directory: ./protoc-gen-polyglot-rs
+        working-directory: ./protoc-gen-rs-polyglot
         run: protoc --polyglot-rs_out=../ examples/tests/tests.proto
       - run: rustup component add clippy
       - uses: actions-rs/clippy-check@v1
