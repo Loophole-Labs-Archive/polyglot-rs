@@ -7,7 +7,7 @@
 
 {{define "enum"}}
 {{ $enumName := (CamelCase $.FullName) -}}
-#[derive(Debug, Eq, PartialEq, TryFromPrimitive)]
+#[derive(Debug, Eq, PartialEq, TryFromPrimitive, Copy, Clone)]
 #[repr(u32)]
 pub enum {{ $enumName }} {
     {{range $i, $v := (MakeIterable $.Values.Len) -}}
