@@ -5,12 +5,12 @@ use crate::tests::{
     Data, Decode, Encode, Request, RequestCorpus, Response, SearchResponse, SearchResponseResult,
     StockPrices, StockPricesSuperWrap, StockPricesWrapper, Test,
 };
+use base64::{engine::general_purpose, Engine as _};
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::fs;
 use std::io::Cursor;
 use std::path::Path;
-use base64::{Engine as _, engine::general_purpose};
 
 #[derive(Debug, Deserialize)]
 struct GeneratorTestData {
@@ -33,7 +33,9 @@ fn get_test_data() -> GeneratorTestData {
 #[test]
 fn test_decode() {
     let test_b64 = get_test_data();
-    let mut poly_data = general_purpose::STANDARD_NO_PAD.decode(test_b64.testall).unwrap();
+    let mut poly_data = general_purpose::STANDARD_NO_PAD
+        .decode(test_b64.testall)
+        .unwrap();
     let mut decoder = Cursor::new(poly_data.as_mut());
     tests::TestAll::decode(&mut decoder).unwrap().unwrap();
 }
@@ -41,7 +43,9 @@ fn test_decode() {
 #[test]
 fn test_encode() {
     let test_b64 = get_test_data();
-    let poly_data = general_purpose::STANDARD_NO_PAD.decode(test_b64.testall).unwrap();
+    let poly_data = general_purpose::STANDARD_NO_PAD
+        .decode(test_b64.testall)
+        .unwrap();
 
     let test = tests::TestAll {
         request: Request {
@@ -82,6 +86,6 @@ fn test_encode() {
     };
 
     let mut encoder: Cursor<Vec<u8>> = Cursor::new(Vec::with_capacity(512));
-    test.encode(&mut encoder);
+    test.encode(&mut encoder).expect("Failed to encode");
     assert_eq!(poly_data, encoder.into_inner());
 }
