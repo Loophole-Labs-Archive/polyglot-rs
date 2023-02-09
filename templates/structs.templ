@@ -9,7 +9,15 @@
         {{ range $i, $v := (MakeIterable $.Fields.Len) -}}
             {{ $field := $.Fields.Get $i -}}
             {{ $value := FindValue $field -}}
+
+            {{  $privacy := GeneratedFieldPrivacy -}}
+            {{ if eq $privacy "private" -}}
+            {{ SnakeCaseName $field.Name }}: {{ $value }},
+            {{ else if eq $privacy "public" -}}
             pub {{ SnakeCaseName $field.Name }}: {{ $value }},
+            {{ else -}}
+            pub(crate) {{ SnakeCaseName $field.Name }}: {{ $value }},
+            {{ end -}}
         {{end -}}
     }
 

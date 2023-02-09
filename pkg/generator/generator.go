@@ -18,6 +18,7 @@ package generator
 
 import (
 	"bytes"
+	"flag"
 	"os/exec"
 	"protoc-gen-polyglot-rs/pkg/utils"
 	"text/template"
@@ -27,6 +28,14 @@ import (
 	"google.golang.org/protobuf/types/pluginpb"
 	"protoc-gen-polyglot-rs/internal/version"
 	"protoc-gen-polyglot-rs/templates"
+)
+
+type GeneratedFieldPrivacy string
+
+const (
+	GeneratedFieldPrivacyPrivate = "private"
+	GeneratedFieldPrivacyPublic  = "public"
+	GeneratedFieldPrivacyCrate   = "crate"
 )
 
 type Generator struct {
@@ -39,6 +48,10 @@ type Generator struct {
 
 func New() *Generator {
 	var g *Generator
+
+	var flags flag.FlagSet
+	privacy := flags.String("privacy", GeneratedFieldPrivacyPrivate, "Privacy of generated fields (private, public, crate)")
+
 	templ := template.Must(template.New("main").Funcs(template.FuncMap{
 		"CamelCase":          utils.CamelCaseFullName,
 		"CamelCaseName":      utils.CamelCaseName,
@@ -64,10 +77,14 @@ func New() *Generator {
 		"CustomDecode": func() string {
 			return g.CustomDecode()
 		},
+		"GeneratedFieldPrivacy": func() GeneratedFieldPrivacy {
+			return GeneratedFieldPrivacy(*privacy)
+		},
 	}).ParseFS(templates.FS, "*"))
+
 	g = &Generator{
 		options: &protogen.Options{
-			ParamFunc:         func(name string, value string) error { return nil },
+			ParamFunc:         flags.Set,
 			ImportRewriteFunc: func(path protogen.GoImportPath) protogen.GoImportPath { return path },
 		},
 		templ:        templ,
@@ -123,14 +140,13 @@ func (g *Generator) ExecuteTemplate(
 	deps := DependencyAnalysis(protoFile)
 
 	err := g.templ.ExecuteTemplate(&buf, "base.templ", map[string]interface{}{
-		"pluginVersion":   version.Version,
-		"sourcePath":      protoFile.Desc.Path(),
-		"package":         packageName,
-		"requiredImports": requiredImports,
-		"enums":           protoFile.Desc.Enums(),
-		"messages":        protoFile.Desc.Messages(),
-		"header":          header,
-		"dependencies":    deps,
+		"pluginVersion": version.Version,
+		"sourcePath":    protoFile.Desc.Path(),
+		"package":       packageName,
+		"enums":         protoFile.Desc.Enums(),
+		"messages":      protoFile.Desc.Messages(),
+		"header":        header,
+		"dependencies":  deps,
 	})
 	if err != nil {
 		return err
