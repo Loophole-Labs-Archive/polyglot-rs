@@ -6,7 +6,7 @@ description="Library used for encoding and decoding data types from a portable b
 license = "Apache-2.0"
 repository = "https://github.com/loopholelabs/polyglot-rs"
 readme = "README.md"
-keywords = ["polyglot", "serialization", "deserialization", "encoding", "decoding", "byte buffer", "rpc"]
+keywords = ["polyglot", "serialization", "deserialization", "encoding", "decoding"]
 exclude = [
     "**/*.go",
     "**/*.templ",
