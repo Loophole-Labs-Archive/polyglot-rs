@@ -30,7 +30,7 @@ pub enum EncodingError {
 
 impl Display for EncodingError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 
@@ -58,7 +58,7 @@ pub trait Encoder {
     fn encode_string(self, val: &str) -> Result<Self, EncodingError>
     where
         Self: Sized;
-    fn encode_error(self, val: Box<dyn std::error::Error>) -> Result<Self, EncodingError>
+    fn encode_error(self, val: Box<dyn Error>) -> Result<Self, EncodingError>
     where
         Self: Sized;
     fn encode_bool(self, val: bool) -> Result<Self, EncodingError>
@@ -129,7 +129,7 @@ impl Encoder for &mut Cursor<Vec<u8>> {
         Ok(self)
     }
 
-    fn encode_error(self, val: Box<dyn std::error::Error>) -> Result<Self, EncodingError> {
+    fn encode_error(self, val: Box<dyn Error>) -> Result<Self, EncodingError> {
         let b = val.to_string().as_bytes().to_owned();
         self.write_u8(Kind::Error as u8)?;
         self.write_u8(Kind::String as u8)?;
