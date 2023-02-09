@@ -61,7 +61,9 @@ fn get_test_data() -> Vec<TestData> {
             name: td.name,
             kind: Kind::from(td.kind),
             decoded_value: td.decoded_value,
-            encoded_value: general_purpose::STANDARD_NO_PAD::decode(td.encoded_value).unwrap(),
+            encoded_value: general_purpose::STANDARD_NO_PAD
+                .decode(td.encoded_value)
+                .unwrap(),
         };
     })
     .collect::<Vec<TestData>>();
@@ -175,7 +177,8 @@ fn test_decode() {
 
                 assert_eq!(
                     val,
-                    general_purpose::STANDARD_NO_PAD::decode(td.decoded_value.as_str().unwrap())
+                    general_purpose::STANDARD_NO_PAD
+                        .decode(td.decoded_value.as_str().unwrap())
                         .unwrap()
                 );
             }
@@ -327,10 +330,9 @@ fn test_encode() {
             Kind::Bytes => {
                 let val = encoder
                     .encode_bytes(
-                        &general_purpose::STANDARD_NO_PAD::decode(
-                            td.decoded_value.as_str().unwrap(),
-                        )
-                        .unwrap(),
+                        &general_purpose::STANDARD_NO_PAD
+                            .decode(td.decoded_value.as_str().unwrap())
+                            .unwrap(),
                     )
                     .unwrap();
 
