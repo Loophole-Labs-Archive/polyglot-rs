@@ -4,7 +4,7 @@
 [![Tests](https://github.com/loopholelabs/polyglot-rs/actions/workflows/tests.yml/badge.svg)](https://github.com/loopholelabs/polyglot-rs/actions/workflows/tests.yml)
 [![Linting](https://github.com/loopholelabs/polyglot-rs/actions/workflows/lint.yml/badge.svg)](https://github.com/loopholelabs/polyglot-rs/actions/workflows/lint.yml)
 
-Rust library used for encoding and decoding data types from a portable byte buffer, used in [fRPC](https://github.com/loopholelabs/frisbee-go)
+Rust library used for encoding and decoding data types from a portable byte buffer, used in [fRPC](https://github.com/loopholelabs/frpc-go)
 
 ## Contributing
 
