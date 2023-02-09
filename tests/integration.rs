@@ -14,11 +14,12 @@
     limitations under the License.
 */
 
-extern crate polyglot;
+extern crate polyglot_rs;
 
-use polyglot::Decoder;
-use polyglot::Encoder;
-use polyglot::Kind;
+use base64::{engine::general_purpose, Engine as _};
+use polyglot_rs::Decoder;
+use polyglot_rs::Encoder;
+use polyglot_rs::Kind;
 use serde::Deserialize;
 use serde_json::Value;
 use std::error::Error;
@@ -60,7 +61,7 @@ fn get_test_data() -> Vec<TestData> {
             name: td.name,
             kind: Kind::from(td.kind),
             decoded_value: td.decoded_value,
-            encoded_value: base64::decode(td.encoded_value).unwrap(),
+            encoded_value: general_purpose::STANDARD.decode(td.encoded_value).unwrap(),
         };
     })
     .collect::<Vec<TestData>>();
@@ -129,17 +130,13 @@ fn test_decode() {
             Kind::F32 => {
                 let val = decoder.decode_f32().unwrap();
 
-                assert!(
-                    (val as f32 - td.decoded_value.as_f64().unwrap() as f32) < std::f32::EPSILON
-                );
+                assert!((val as f32 - td.decoded_value.as_f64().unwrap() as f32) < f32::EPSILON);
             }
 
             Kind::F64 => {
                 let val = decoder.decode_f64().unwrap();
 
-                assert!(
-                    (val as f64 - td.decoded_value.as_f64().unwrap() as f64) < std::f64::EPSILON
-                );
+                assert!((val as f64 - td.decoded_value.as_f64().unwrap() as f64) < f64::EPSILON);
             }
 
             Kind::Array => {
@@ -178,7 +175,9 @@ fn test_decode() {
 
                 assert_eq!(
                     val,
-                    base64::decode(td.decoded_value.as_str().unwrap()).unwrap()
+                    general_purpose::STANDARD
+                        .decode(td.decoded_value.as_str().unwrap())
+                        .unwrap()
                 );
             }
 
@@ -328,7 +327,11 @@ fn test_encode() {
 
             Kind::Bytes => {
                 let val = encoder
-                    .encode_bytes(&base64::decode(td.decoded_value.as_str().unwrap()).unwrap())
+                    .encode_bytes(
+                        &general_purpose::STANDARD
+                            .decode(td.decoded_value.as_str().unwrap())
+                            .unwrap(),
+                    )
                     .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);

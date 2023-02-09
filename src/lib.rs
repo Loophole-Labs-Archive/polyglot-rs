@@ -23,4 +23,5 @@ mod kind;
 pub use decoder::Decoder;
 pub use decoder::DecodingError;
 pub use encoder::Encoder;
+pub use encoder::EncodingError;
 pub use kind::Kind;

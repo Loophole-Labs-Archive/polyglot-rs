@@ -17,7 +17,7 @@
 package main
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"protoc-gen-polyglot-rs/pkg/generator"
 )
@@ -25,7 +25,7 @@ import (
 func main() {
 	gen := generator.New()
 
-	data, err := ioutil.ReadAll(os.Stdin)
+	data, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		panic(err)
 	}
