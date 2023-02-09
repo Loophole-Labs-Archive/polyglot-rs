@@ -1,6 +1,6 @@
 {{define "imports"}}
 use std::io::Cursor;
-use polyglot::{DecodingError, EncodingError, Encoder, Decoder, Kind};
+use polyglot_rs::{DecodingError, EncodingError, Encoder, Decoder, Kind};
 {{ if .dependencies.Enums -}}
 use num_enum::TryFromPrimitive;
 use std::convert::TryFrom;
