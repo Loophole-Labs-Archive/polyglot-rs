@@ -61,9 +61,7 @@ fn get_test_data() -> Vec<TestData> {
             name: td.name,
             kind: Kind::from(td.kind),
             decoded_value: td.decoded_value,
-            encoded_value: general_purpose::STANDARD
-                .decode(td.encoded_value)
-                .unwrap(),
+            encoded_value: general_purpose::STANDARD.decode(td.encoded_value).unwrap(),
         };
     })
     .collect::<Vec<TestData>>();
