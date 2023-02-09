@@ -16,6 +16,7 @@
 
 extern crate polyglot_rs;
 
+use base64::{engine::general_purpose, Engine as _};
 use polyglot_rs::Decoder;
 use polyglot_rs::Encoder;
 use polyglot_rs::Kind;
@@ -25,7 +26,6 @@ use std::error::Error;
 use std::fs;
 use std::io::Cursor;
 use std::path::Path;
-use base64::{Engine as _, engine::general_purpose};
 
 #[derive(Debug, Deserialize)]
 struct RawTestData {
@@ -130,17 +130,13 @@ fn test_decode() {
             Kind::F32 => {
                 let val = decoder.decode_f32().unwrap();
 
-                assert!(
-                    (val as f32 - td.decoded_value.as_f64().unwrap() as f32) < f32::EPSILON
-                );
+                assert!((val as f32 - td.decoded_value.as_f64().unwrap() as f32) < f32::EPSILON);
             }
 
             Kind::F64 => {
                 let val = decoder.decode_f64().unwrap();
 
-                assert!(
-                    (val as f64 - td.decoded_value.as_f64().unwrap() as f64) < f64::EPSILON
-                );
+                assert!((val as f64 - td.decoded_value.as_f64().unwrap() as f64) < f64::EPSILON);
             }
 
             Kind::Array => {
@@ -179,7 +175,8 @@ fn test_decode() {
 
                 assert_eq!(
                     val,
-                    general_purpose::STANDARD_NO_PAD::decode(td.decoded_value.as_str().unwrap()).unwrap()
+                    general_purpose::STANDARD_NO_PAD::decode(td.decoded_value.as_str().unwrap())
+                        .unwrap()
                 );
             }
 
@@ -329,7 +326,12 @@ fn test_encode() {
 
             Kind::Bytes => {
                 let val = encoder
-                    .encode_bytes(&general_purpose::STANDARD_NO_PAD::decode(td.decoded_value.as_str().unwrap()).unwrap())
+                    .encode_bytes(
+                        &general_purpose::STANDARD_NO_PAD::decode(
+                            td.decoded_value.as_str().unwrap(),
+                        )
+                        .unwrap(),
+                    )
                     .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
