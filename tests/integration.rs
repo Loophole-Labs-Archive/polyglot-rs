@@ -25,7 +25,7 @@ use std::error::Error;
 use std::fs;
 use std::io::Cursor;
 use std::path::Path;
-use base64::engine;
+use base64::{Engine as _, engine::general_purpose};
 
 #[derive(Debug, Deserialize)]
 struct RawTestData {
@@ -61,7 +61,7 @@ fn get_test_data() -> Vec<TestData> {
             name: td.name,
             kind: Kind::from(td.kind),
             decoded_value: td.decoded_value,
-            encoded_value: engine::decode(td.encoded_value).unwrap(),
+            encoded_value: general_purpose::decode(td.encoded_value).unwrap(),
         };
     })
     .collect::<Vec<TestData>>();
@@ -179,7 +179,7 @@ fn test_decode() {
 
                 assert_eq!(
                     val,
-                    engine::decode(td.decoded_value.as_str().unwrap()).unwrap()
+                    general_purpose::decode(td.decoded_value.as_str().unwrap()).unwrap()
                 );
             }
 
@@ -329,7 +329,7 @@ fn test_encode() {
 
             Kind::Bytes => {
                 let val = encoder
-                    .encode_bytes(&engine::decode(td.decoded_value.as_str().unwrap()).unwrap())
+                    .encode_bytes(&general_purpose::decode(td.decoded_value.as_str().unwrap()).unwrap())
                     .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
