@@ -1,4 +1,4 @@
-extern crate polyglot;
+extern crate polyglot_rs;
 
 mod tests;
 use crate::tests::{
@@ -10,6 +10,7 @@ use std::collections::HashMap;
 use std::fs;
 use std::io::Cursor;
 use std::path::Path;
+use base64::engine;
 
 #[derive(Debug, Deserialize)]
 struct GeneratorTestData {
@@ -32,7 +33,7 @@ fn get_test_data() -> GeneratorTestData {
 #[test]
 fn test_decode() {
     let test_b64 = get_test_data();
-    let mut poly_data = base64::decode(test_b64.testall).unwrap();
+    let mut poly_data = engine::decode(test_b64.testall).unwrap();
     let mut decoder = Cursor::new(poly_data.as_mut());
     tests::TestAll::decode(&mut decoder).unwrap().unwrap();
 }
@@ -40,7 +41,7 @@ fn test_decode() {
 #[test]
 fn test_encode() {
     let test_b64 = get_test_data();
-    let poly_data = base64::decode(test_b64.testall).unwrap();
+    let poly_data = engine::decode(test_b64.testall).unwrap();
 
     let test = tests::TestAll {
         request: Request {

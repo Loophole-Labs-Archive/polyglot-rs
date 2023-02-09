@@ -25,6 +25,7 @@ use std::error::Error;
 use std::fs;
 use std::io::Cursor;
 use std::path::Path;
+use base64::engine;
 
 #[derive(Debug, Deserialize)]
 struct RawTestData {
@@ -60,7 +61,7 @@ fn get_test_data() -> Vec<TestData> {
             name: td.name,
             kind: Kind::from(td.kind),
             decoded_value: td.decoded_value,
-            encoded_value: base64::decode(td.encoded_value).unwrap(),
+            encoded_value: engine::decode(td.encoded_value).unwrap(),
         };
     })
     .collect::<Vec<TestData>>();
@@ -130,7 +131,7 @@ fn test_decode() {
                 let val = decoder.decode_f32().unwrap();
 
                 assert!(
-                    (val as f32 - td.decoded_value.as_f64().unwrap() as f32) < std::f32::EPSILON
+                    (val as f32 - td.decoded_value.as_f64().unwrap() as f32) < f32::EPSILON
                 );
             }
 
@@ -138,7 +139,7 @@ fn test_decode() {
                 let val = decoder.decode_f64().unwrap();
 
                 assert!(
-                    (val as f64 - td.decoded_value.as_f64().unwrap() as f64) < std::f64::EPSILON
+                    (val as f64 - td.decoded_value.as_f64().unwrap() as f64) < f64::EPSILON
                 );
             }
 
@@ -178,7 +179,7 @@ fn test_decode() {
 
                 assert_eq!(
                     val,
-                    base64::decode(td.decoded_value.as_str().unwrap()).unwrap()
+                    engine::decode(td.decoded_value.as_str().unwrap()).unwrap()
                 );
             }
 
@@ -328,7 +329,7 @@ fn test_encode() {
 
             Kind::Bytes => {
                 let val = encoder
-                    .encode_bytes(&base64::decode(td.decoded_value.as_str().unwrap()).unwrap())
+                    .encode_bytes(&engine::decode(td.decoded_value.as_str().unwrap()).unwrap())
                     .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
