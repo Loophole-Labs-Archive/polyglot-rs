@@ -1,6 +1,6 @@
 {{define "messages"}}
 pub trait Encode {
-    fn encode<'a> (&'a self, b: &'a mut Cursor<Vec<u8>>) -> Result<&mut Cursor<Vec<u8>>, EncodingError>;
+    fn encode<'a> (&'a self, b: &'a mut Cursor<Vec<u8>>) -> Result<&mut Cursor<Vec<u8>>, Box<dyn std::error::Error>>;
 }
 
 pub trait Decode {
