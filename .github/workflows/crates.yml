@@ -1,0 +1,32 @@
+name: Publish to crates.io
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+      - name: Install protoc-gen plugin
+        working-directory: ./protoc-gen-polyglot-rs
+        run: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+      - name: Install polyglot plugin for protoc-gen
+        working-directory: ./protoc-gen-polyglot-rs
+        run: go install protoc-gen-polyglot-rs/protoc-gen-polyglot-rs
+      - name: Run generator
+        working-directory: ./protoc-gen-polyglot-rs
+        run: protoc --polyglot-rs_out=../ examples/tests/tests.proto
+      - name: Run fmt
+        run: cargo fmt --all -- --check
+      - name: Build
+        run: cargo build --verbose --release
+      - name: Publish to crates.io
+        run: cargo publish --token $CRATES_IO_TOKEN
+        env:
+          CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
