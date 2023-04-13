@@ -1,4 +1,4 @@
-module protoc-gen-polyglot-rs
+module github.com/loopholelabs/polyglot-go
 
 go 1.18
 
