@@ -21,7 +21,7 @@ jobs:
       - name: Install protoc-gen plugin
         run: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
       - name: Install polyglot plugin for protoc-gen
-        run: go install ./protoc-gen-rs-polyglot/protoc-gen-rs-polyglot
+        run: go install ./
       - name: Run generator
         run: protoc --rs-polyglot_out=privacy=public:./ examples/tests/tests.proto
       - name: Run fmt
