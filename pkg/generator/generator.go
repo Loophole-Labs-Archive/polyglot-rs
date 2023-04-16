@@ -19,15 +19,15 @@ package generator
 import (
 	"bytes"
 	"flag"
+	"github.com/loopholelabs/polyglot-rs/pkg/utils"
 	"os/exec"
-	"protoc-gen-polyglot-rs/pkg/utils"
 	"text/template"
 
+	"github.com/loopholelabs/polyglot-rs/internal/version"
+	"github.com/loopholelabs/polyglot-rs/templates"
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/pluginpb"
-	"protoc-gen-polyglot-rs/internal/version"
-	"protoc-gen-polyglot-rs/templates"
 )
 
 type GeneratedFieldPrivacy string
