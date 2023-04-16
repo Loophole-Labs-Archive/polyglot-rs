@@ -17,9 +17,9 @@
 package main
 
 import (
+	"github.com/loopholelabs/polyglot-rs/pkg/generator"
 	"io"
 	"os"
-	"protoc-gen-polyglot-rs/pkg/generator"
 )
 
 func main() {

@@ -1,4 +1,4 @@
-module github.com/loopholelabs/polyglot-go
+module github.com/loopholelabs/polyglot-rs
 
 go 1.18
 
