@@ -59,8 +59,8 @@ pub trait Encoder {
     where
         Self: Sized;
     fn encode_str(self, val: &str) -> Result<Self, io::Error>
-        where
-            Self: Sized;
+    where
+        Self: Sized;
     fn encode_error(self, val: Box<dyn std::error::Error>) -> Result<Self, EncodingError>
     where
         Self: Sized;
