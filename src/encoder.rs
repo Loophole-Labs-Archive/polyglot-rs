@@ -34,9 +34,12 @@ pub trait Encoder {
     fn encode_bytes(self, val: &[u8]) -> Result<Self, io::Error>
     where
         Self: Sized;
-    fn encode_string(self, val: &str) -> Result<Self, io::Error>
+    fn encode_string(self, val: &String) -> Result<Self, io::Error>
     where
         Self: Sized;
+    fn encode_str(self, val: &str) -> Result<Self, io::Error>
+        where
+            Self: Sized;
     fn encode_error(self, val: Box<dyn std::error::Error>) -> Result<Self, io::Error>
     where
         Self: Sized;
@@ -95,7 +98,15 @@ impl Encoder for &mut Cursor<Vec<u8>> {
         Ok(self)
     }
 
-    fn encode_string(self, val: &str) -> Result<Self, io::Error> {
+    fn encode_string(self, val: &String) -> Result<Self, io::Error> {
+        let b = val.as_bytes();
+        self.write_u8(Kind::String as u8)?;
+        self.encode_u32(b.len() as u32)?;
+        self.write_all(b)?;
+        Ok(self)
+    }
+
+    fn encode_str(self, val: &str) -> Result<Self, io::Error> {
         let b = val.as_bytes();
         self.write_u8(Kind::String as u8)?;
         self.encode_u32(b.len() as u32)?;
