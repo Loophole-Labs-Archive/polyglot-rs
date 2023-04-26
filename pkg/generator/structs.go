@@ -168,7 +168,7 @@ func getEncodingFields(fields protoreflect.FieldDescriptors) encodingFields {
 				if field.Kind() == protoreflect.EnumKind {
 					values = append(values, fmt.Sprintf("%s(self.%s  as u32)", encoder, utils.SnakeCaseName(field.Name())))
 				} else if field.Kind() == protoreflect.StringKind {
-					values = append(values, fmt.Sprintf("%s(&*self.%s)", encoder, utils.SnakeCaseName(field.Name())))
+					values = append(values, fmt.Sprintf("%s(&self.%s)", encoder, utils.SnakeCaseName(field.Name())))
 				} else if field.Kind() == protoreflect.BytesKind {
 					values = append(values, fmt.Sprintf("%s(&self.%s)", encoder, utils.SnakeCaseName(field.Name())))
 				} else {
