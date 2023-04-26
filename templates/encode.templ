@@ -64,8 +64,6 @@ impl Encode for {{ CamelCase .FullName }} {
             {{else -}}
                 {{ if eq $field.MapValue.Kind 14 -}}  {{/* protoreflect.EnumKind */ -}}
                 b.encode_u32(*v as u32)?;
-                {{ else if eq $field.MapValue.Kind 9 -}}  {{/* protoreflect.StringsKind */ -}}
-                    b{{$valEncoder}}(&*v)?;
                 {{else -}}
                     b{{$valEncoder}}(*v)?;
                 {{end -}}
