@@ -297,7 +297,7 @@ fn test_encode() {
                 let expected = td.decoded_value.as_array().unwrap();
 
                 for el in expected.into_iter() {
-                    val = val.encode_string(el.as_str().unwrap()).unwrap();
+                    val = val.encode_str(el.as_str().unwrap()).unwrap();
                 }
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
@@ -339,7 +339,7 @@ fn test_encode() {
 
             Kind::String => {
                 let val = encoder
-                    .encode_string(td.decoded_value.as_str().unwrap())
+                    .encode_str(td.decoded_value.as_str().unwrap())
                     .unwrap();
 
                 assert_eq!(*val.get_ref(), td.encoded_value);
