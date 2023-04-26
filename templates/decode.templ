@@ -10,6 +10,7 @@ impl Decode for {{ CamelCase .FullName }} {
             return Err(error);
         }
 
+
         {{ $decoding := GetDecodingFields .Fields -}}
         {{ range $field := $decoding.SliceFields -}}
         {{ $val := FindValue $field }}

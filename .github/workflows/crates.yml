@@ -1,13 +1,8 @@
-name: Build
+name: Publish to crates.io
 
 on:
-  push:
-    branches: ["staging"]
-  pull_request:
-    branches: ["staging"]
-
-env:
-  CARGO_TERM_COLOR: always
+  release:
+    types: [created]
 
 jobs:
   build:
@@ -19,12 +14,19 @@ jobs:
       - name: Install Protoc
         uses: arduino/setup-protoc@v1
       - name: Install protoc-gen plugin
+        working-directory: ./protoc-gen-polyglot-rs
         run: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
       - name: Install polyglot plugin for protoc-gen
+        working-directory: ./
         run: go install ./protoc-gen-rs-polyglot
       - name: Run generator
-        run: protoc --rs-polyglot_out=privacy=public:./ examples/tests/tests.proto
+        working-directory: ./protoc-gen-polyglot-rs
+        run: protoc --polyglot-rs_out=../ examples/tests/tests.proto
       - name: Run fmt
         run: cargo fmt --all -- --check
       - name: Build
-        run: cargo build --verbose
+        run: cargo build --verbose --release
+      - name: Publish to crates.io
+        run: cargo publish --token $CRATES_IO_TOKEN
+        env:
+          CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}

@@ -21,13 +21,6 @@ import (
 	"google.golang.org/protobuf/reflect/protoreflect"
 )
 
-var (
-	requiredImports = []string{
-		"github.com/loopholelabs/polyglot-go",
-		"errors",
-	}
-)
-
 type Dependencies struct {
 	Enums bool
 	Maps  bool

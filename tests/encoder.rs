@@ -14,10 +14,10 @@
     limitations under the License.
 */
 
-extern crate polyglot;
+extern crate polyglot_rs;
 
-use polyglot::Encoder;
-use polyglot::Kind;
+use polyglot_rs::Encoder;
+use polyglot_rs::Kind;
 use std::error::Error;
 use std::io::Cursor;
 

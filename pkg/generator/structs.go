@@ -19,8 +19,8 @@ package generator
 import (
 	"errors"
 	"fmt"
+	"github.com/loopholelabs/polyglot-rs/pkg/utils"
 	"google.golang.org/protobuf/reflect/protoreflect"
-	"protoc-gen-polyglot-rs/pkg/utils"
 )
 
 var (

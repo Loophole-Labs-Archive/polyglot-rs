@@ -1,1 +1,2 @@
 - Alex Sørlie Glomsaas <alexsorlieglomsaas@loopholelabs.io> @supermanifolds
+- Shivansh Vij <shivanshvij@loopholelabs.io> @shivanshvij

@@ -17,7 +17,7 @@
 package generator
 
 import (
-	"protoc-gen-polyglot-rs/pkg/utils"
+	"github.com/loopholelabs/polyglot-rs/pkg/utils"
 )
 
 func FileName(name string) string {

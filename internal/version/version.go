@@ -14,39 +14,8 @@
 	limitations under the License.
 */
 
-package main
+package version
 
-import (
-	"io/ioutil"
-	"os"
-	"protoc-gen-polyglot-rs/pkg/generator"
+const (
+	Version = "v0.6.1"
 )
-
-func main() {
-	gen := generator.New()
-
-	data, err := ioutil.ReadAll(os.Stdin)
-	if err != nil {
-		panic(err)
-	}
-
-	req, err := gen.UnmarshalRequest(data)
-	if err != nil {
-		panic(err)
-	}
-
-	res, err := gen.Generate(req)
-	if err != nil {
-		panic(err)
-	}
-
-	data, err = gen.MarshalResponse(res)
-	if err != nil {
-		panic(err)
-	}
-
-	_, err = os.Stdout.Write(data)
-	if err != nil {
-		panic(err)
-	}
-}
