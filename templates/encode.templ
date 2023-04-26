@@ -29,7 +29,7 @@ impl Encode for {{ CamelCase .FullName }} {
         b.encode_array(self.{{ SnakeCaseName $field.Name}}.len(), {{ GetKindLUT $field.Kind }})?;
         for item in &self.{{ SnakeCaseName $field.Name}} {
             {{ if eq $field.Kind 9 -}} {{/* protoreflect.StringKind */ -}}
-            b{{$encoder}}(&*item)?;
+            b{{$encoder}}(&item)?;
             {{ else -}}
             b{{$encoder}}(item)?;
             {{ end -}}
