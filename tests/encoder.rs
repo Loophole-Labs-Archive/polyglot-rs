@@ -66,8 +66,8 @@ fn test_encode_bytes() {
 #[test]
 fn test_encode_string() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
-    let v = "Test String";
-    encoder.encode_string(v).unwrap();
+    let v = "Test String".to_string();
+    encoder.encode_string(&v).unwrap();
 
     assert_eq!(encoder.position() as usize, 1 + 1 + 1 + v.len());
     assert_eq!(encoder.get_ref()[1 + 1 + 1..].to_owned(), v.as_bytes());

@@ -29,7 +29,7 @@ impl Encode for {{ CamelCase .FullName }} {
         b.encode_array(self.{{ SnakeCaseName $field.Name}}.len(), {{ GetKindLUT $field.Kind }})?;
         for item in &self.{{ SnakeCaseName $field.Name}} {
             {{ if eq $field.Kind 9 -}} {{/* protoreflect.StringKind */ -}}
-            b{{$encoder}}(&*item)?;
+            b{{$encoder}}(&item)?;
             {{ else -}}
             b{{$encoder}}(item)?;
             {{ end -}}
@@ -53,7 +53,7 @@ impl Encode for {{ CamelCase .FullName }} {
                 {{ if eq $field.MapKey.Kind 14 -}}  {{/* protoreflect.EnumKind */ -}}
                 b.encode_u32(k as u32)?;
                 {{ else if eq $field.MapKey.Kind 9 -}}  {{/* protoreflect.StringsKind */ -}}
-                b{{$keyEncoder}}(&*k)?;
+                b{{$keyEncoder}}(&k)?;
                 {{else -}}
                     b{{$keyEncoder}}(k)?;
                 {{end -}}
@@ -64,8 +64,6 @@ impl Encode for {{ CamelCase .FullName }} {
             {{else -}}
                 {{ if eq $field.MapValue.Kind 14 -}}  {{/* protoreflect.EnumKind */ -}}
                 b.encode_u32(*v as u32)?;
-                {{ else if eq $field.MapValue.Kind 9 -}}  {{/* protoreflect.StringsKind */ -}}
-                    b{{$valEncoder}}(&*v)?;
                 {{else -}}
                     b{{$valEncoder}}(*v)?;
                 {{end -}}

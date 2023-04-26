@@ -40,11 +40,11 @@ fn test_decode_nil() {
 #[test]
 fn test_decode_array() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
-    let m = ["1", "2", "3"];
+    let m = ["1".to_string(), "2".to_string(), "3".to_string()];
 
     encoder.encode_array(m.len(), Kind::String).unwrap();
-    for i in m {
-        encoder.encode_string(i).unwrap();
+    for i in m.clone() {
+        encoder.encode_string(&i).unwrap();
     }
 
     let mut decoder = Cursor::new(encoder.get_mut());
@@ -75,11 +75,7 @@ fn test_decode_map() {
         .encode_map(m.len(), Kind::String, Kind::U32)
         .unwrap();
     for (k, v) in m.clone() {
-        encoder
-            .encode_string(k.as_str())
-            .unwrap()
-            .encode_u32(v)
-            .unwrap();
+        encoder.encode_string(&k).unwrap().encode_u32(v).unwrap();
     }
 
     let mut decoder = Cursor::new(encoder.get_mut());
@@ -112,8 +108,8 @@ fn test_decode_bytes() {
 #[test]
 fn test_decode_string() {
     let mut encoder = Cursor::new(Vec::with_capacity(512));
-    let v = "Test String";
-    encoder.encode_string(v).unwrap();
+    let v = "Test String".to_string();
+    encoder.encode_string(&v).unwrap();
 
     let mut decoder = Cursor::new(encoder.get_mut());
     let val = decoder.decode_string().unwrap();
