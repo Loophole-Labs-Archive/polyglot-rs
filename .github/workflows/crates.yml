@@ -17,11 +17,9 @@ jobs:
         working-directory: ./protoc-gen-polyglot-rs
         run: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
       - name: Install polyglot plugin for protoc-gen
-        working-directory: ./
         run: go install ./protoc-gen-rs-polyglot
       - name: Run generator
-        working-directory: ./protoc-gen-polyglot-rs
-        run: protoc --polyglot-rs_out=../ examples/tests/tests.proto
+        run: protoc --rs-polyglot_out=privacy=public:./ examples/tests/tests.proto
       - name: Run fmt
         run: cargo fmt --all -- --check
       - name: Build
